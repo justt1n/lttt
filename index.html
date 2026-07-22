@@ -133,6 +133,12 @@
         <li><a href="#de3">Đề 3 — Tổng hợp (khử đệ quy trái, phân cấp, bổ đề bơm)</a></li>
       </ol>
     </li>
+    <li><a href="#detuluan"><b>LỜI GIẢI CHI TIẾT — ĐỀ THI TỰ LUẬN (bt)</b></a>
+      <ol>
+        <li><a href="#tl-cau1">Câu 1 — Văn phạm S → aSb | bSa | SS | ε</a></li>
+        <li><a href="#tl-cau2">Câu 2 — Automat LR(0)/LR(1): S → SP | P, P → (S) | ( )</a></li>
+      </ol>
+    </li>
     <li><a href="#checklist">Checklist ôn thi nhanh</a></li>
   </ol>
 </nav>
@@ -858,6 +864,156 @@ F  → ( E ) | id</pre>
 <p>Bơm <code>n=2</code>: <code>xy²z = a<sup>p+k</sup>b<sup>2p</sup></code>. Điều kiện thuộc L là “số <code>b</code> = 2 × số <code>a</code>”, tức cần <code>2(p+k) = 2p</code> ⇒ <code>k=0</code>, mâu thuẫn <code>k≥1</code>. Vậy <code>xy²z ∉ L</code> ⇒ <b>L không chính quy.</b> ∎</p>
 </div>
 </div>
+
+<!-- =================================================================== -->
+<!-- LỜI GIẢI CHI TIẾT ĐỀ TỰ LUẬN -->
+<!-- =================================================================== -->
+<h2 id="detuluan">LỜI GIẢI CHI TIẾT — ĐỀ THI TỰ LUẬN (bt)</h2>
+<p class="lead">Giải đầy đủ, trình bày kiểu tự luận cho hai câu trong đề thi thật (ảnh <code>bt</code>): Câu 1 về văn phạm phi ngữ cảnh &amp; khử nhập nhằng, Câu 2 về bộ phân tích LR.</p>
+
+<!-- ===== CÂU 1 ===== -->
+<h3 id="tl-cau1">Câu 1 — Cho văn phạm phi ngữ cảnh: <code>S → aSb | bSa | SS | ε</code></h3>
+
+<h4>a) Chỉ ra một dẫn xuất trái nhất để S sinh ra chuỗi <code>aababb</code></h4>
+<p>Nhận xét định hướng: <code>aababb</code> có 3 <code>a</code> và 3 <code>b</code>. Ta “bọc” cặp ngoài bằng <code>S→aSb</code> (nhận <code>a…b</code>), phần giữa <code>abab</code> tách đôi bằng <code>S→SS</code>, mỗi nửa <code>ab</code> sinh bởi <code>S→aSb</code> rồi <code>S→ε</code>.</p>
+<p><b>Dẫn xuất trái nhất</b> (mỗi bước thay biến trái nhất — biến được thay in đậm):</p>
+<pre class="mono">S
+⇒ a S b            (S → aSb)
+⇒ a SS b           (S → SS)          ← thay S trái nhất
+⇒ a aSb S b        (S → aSb)         ← thay S trái nhất
+⇒ a ab S b         (S → ε)           ← "aSb" với S=ε cho "ab"
+⇒ a ab aSb b       (S → aSb)
+⇒ a ab ab b        (S → ε)
+= a a b a b b  =  aababb   ✓</pre>
+<p>Vậy: <code class="kpi">S ⇒ aSb ⇒ aSSb ⇒ aaSbSb ⇒ aabSb ⇒ aabaSbb ⇒ aababb</code>. Cây phân tích tương ứng:</p>
+<pre class="mono">                 S
+        ┌────────┼────────┐
+        a        S        b
+            ┌────┴────┐
+            S         S
+        ┌───┼───┐  ┌──┼──┐
+        a   S   b  a  S  b
+            │        │
+            ε        ε
+lá đọc trái→phải: a · (a b) · (a b) · b = aababb</pre>
+
+<h4>b) Chứng minh văn phạm này nhập nhằng (mơ hồ)</h4>
+<p>Chỉ cần tìm <b>một</b> chuỗi có <b>≥2</b> cây phân tích (≥2 dẫn xuất trái nhất) khác nhau. Lấy chuỗi ngắn nhất <code>ab</code>:</p>
+<div class="itemsets">
+  <div class="iset"><b>Dẫn xuất 1</b>S ⇒ aSb ⇒ a·ε·b = ab
+(dùng S→aSb rồi S→ε)
+
+Cây:   S
+     ┌─┼─┐
+     a S b
+       │
+       ε</div>
+  <div class="iset"><b>Dẫn xuất 2</b>S ⇒ SS ⇒ aSb·S ⇒ ab·S ⇒ ab·ε = ab
+(S→SS; S₁→aSb→ab; S₂→ε)
+
+Cây:     S
+       ┌─┴─┐
+       S   S
+     ┌─┼─┐ │
+     a S b ε
+       │
+       ε</div>
+</div>
+<p>Cùng sinh ra <code>ab</code> nhưng hai cây phân tích khác nhau ⇒ <b>văn phạm nhập nhằng.</b> Nguồn gốc nhập nhằng là luật <code>S→SS</code> kết hợp <code>S→ε</code>: cho phép chèn/ghép chuỗi rỗng ở vô số vị trí (không xác định điểm tách).</p>
+
+<h4>c) Áp dụng kỹ thuật phân tầng để khử nhập nhằng</h4>
+<p><b>Ý tưởng.</b> Loại bỏ tự do của <code>SS</code> bằng cách ép <b>một cách tách duy nhất</b>: đọc ký hiệu đầu tiên, nó quyết định “khối” mở đầu; phần còn lại nối tiếp một cách xác định. Cụ thể mỗi chuỗi khác rỗng được tách thành <b>3 phần</b> (đúng như gợi ý của đề):</p>
+<pre class="mono">nếu bắt đầu bằng a:  w = a · X · b · Y
+nếu bắt đầu bằng b:  w = b · X · a · Y
+   trong đó X là khối cân bằng bên trong (bị ký hiệu đối xứng đóng lại
+   ở vị trí tái cân bằng đầu tiên), Y là phần còn lại.</pre>
+<p><b>Văn phạm sau khi phân tầng (không nhập nhằng):</b></p>
+<pre class="mono">S → a S b S
+  | b S a S
+  | ε</pre>
+<div class="def"><b>Vì sao hết nhập nhằng:</b> với chuỗi khác rỗng, ký hiệu đầu tiên là <code>a</code> hoặc <code>b</code> → chọn được đúng một luật. Vị trí ký hiệu đối xứng (<code>b</code> hoặc <code>a</code>) đóng khối được xác định <b>duy nhất</b> tại điểm tiền tố tái cân bằng số <code>a</code>/<code>b</code> lần đầu; do đó <code>S</code> đầu (khối trong) và <code>S</code> sau (phần còn) đều được xác định duy nhất ⇒ mỗi chuỗi có đúng một cây. Đây là văn phạm chuẩn cho ngôn ngữ “số <code>a</code> bằng số <code>b</code>”.</div>
+<p><b>Kiểm chứng với <code>aabb</code> (tách 3 phần):</b> ký hiệu đầu <code>a</code> ⇒ dùng <code>S→aSbS</code>. Tái cân bằng đầu tiên sau <code>a</code>: tiền tố <code>a a b</code> chưa cân bằng, <code>a a b b</code> cân bằng ⇒ ký hiệu <code>b</code> đóng khối là <code>b</code> cuối; khối trong <code>X=ab</code>, phần còn <code>Y=ε</code>.</p>
+<pre class="mono">S ⇒ a S b S
+  ⇒ a (aSbS) b S      [khối trong X: bắt đầu a]
+  ⇒ a (a·ε·b·ε) b ε   [X = ab ; Y = ε]
+  = a ab b = aabb      (duy nhất một cây)  ✓</pre>
+
+<!-- ===== CÂU 2 ===== -->
+<h3 id="tl-cau2">Câu 2 — <code>S → SP | P</code>, &nbsp; <code>P → (S) | ( )</code></h3>
+
+<h4>a) Xây automat LR(0); chỉ ra trạng thái reduce; có trạng thái nào bị đụng không?</h4>
+<p><b>Bước 1 — Bổ sung luật (augment)</b> và đánh số:</p>
+<pre class="mono">0: S' → S
+1: S  → S P
+2: S  → P
+3: P  → ( S )
+4: P  → ( )</pre>
+<p><b>Bước 2 — Các tập item (closure/goto):</b></p>
+<div class="itemsets">
+  <div class="iset"><b>I0 = closure(S'→·S)</b>S' → · S
+S  → · S P
+S  → · P
+P  → · ( S )
+P  → · ( )</div>
+  <div class="iset"><b>I1 = goto(I0,S)</b>S' → S ·   <i>(accept /$)</i>
+S  → S · P
+P  → · ( S )
+P  → · ( )</div>
+  <div class="iset"><b>I2 = goto(I0,P)</b>S → P ·   <i>(reduce luật 2)</i></div>
+  <div class="iset"><b>I3 = goto(I0,&lsquo;(&rsquo;)</b>P → ( · S )
+P → ( · )
+S → · S P
+S → · P
+P → · ( S )
+P → · ( )</div>
+  <div class="iset"><b>I4 = goto(I1,P)</b>S → S P ·   <i>(reduce luật 1)</i></div>
+  <div class="iset"><b>I5 = goto(I3,S)</b>P → ( S · )
+S → S · P
+P → · ( S )
+P → · ( )</div>
+  <div class="iset"><b>I6 = goto(I3,&lsquo;)&rsquo;)</b>P → ( ) ·   <i>(reduce luật 4)</i></div>
+  <div class="iset"><b>I7 = goto(I5,&lsquo;)&rsquo;)</b>P → ( S ) ·   <i>(reduce luật 3)</i></div>
+</div>
+<p><b>Bảng GOTO/chuyển:</b></p>
+<div class="tblwrap"><table>
+<tr><th>Trạng thái</th><th>trên (</th><th>trên )</th><th>trên $</th><th>GOTO S</th><th>GOTO P</th></tr>
+<tr><td class="rowh">I0</td><td>→I3</td><td></td><td></td><td>I1</td><td>I2</td></tr>
+<tr><td class="rowh">I1</td><td>→I3</td><td></td><td class="hl">accept</td><td></td><td>I4</td></tr>
+<tr><td class="rowh">I2</td><td colspan="3">reduce S→P</td><td></td><td></td></tr>
+<tr><td class="rowh">I3</td><td>→I3</td><td>→I6</td><td></td><td>I5</td><td>I2</td></tr>
+<tr><td class="rowh">I4</td><td colspan="3">reduce S→SP</td><td></td><td></td></tr>
+<tr><td class="rowh">I5</td><td>→I3</td><td>→I7</td><td></td><td></td><td>I4</td></tr>
+<tr><td class="rowh">I6</td><td colspan="3">reduce P→( )</td><td></td><td></td></tr>
+<tr><td class="rowh">I7</td><td colspan="3">reduce P→(S)</td><td></td><td></td></tr>
+</table></div>
+<p><b>Trạng thái reduce:</b> <code class="kpi">I2 (S→P·), I4 (S→SP·), I6 (P→( )·), I7 (P→(S)·)</code>. Trạng thái <b>chấp nhận</b>: <code>I1</code> (item <code>S'→S·</code>, chỉ trên <code>$</code>).</p>
+<div class="warn"><b>Có trạng thái nào bị đụng?</b> Bốn trạng thái reduce ở trên <b>đều “sạch”</b>: mỗi trạng thái chỉ chứa <b>một</b> item hoàn tất, không kèm item shift ⇒ không có xung đột reduce-reduce hay shift-reduce ở chúng.
+<br>Chỉ có <b>I1</b> đáng lưu ý: nó chứa item hoàn tất <code>S'→S·</code> (accept) <b>đồng thời</b> cạnh shift <code>(</code> (từ <code>S→S·P</code>). Theo định nghĩa LR(0) thuần (không dùng lookahead) thì đây là <b>xung đột accept/shift</b> — tức <b>I1 là trạng thái “bị đụng”</b>. Tuy nhiên item hoàn tất là luật tăng cường <code>S'→S</code>, việc “accept” chỉ xảy ra trên <code>$</code> còn shift <code>(</code> trên <code>(</code>, nên phân biệt được ngay bằng một ký hiệu nhìn trước ⇒ <b>SLR(1) xử lý sạch, không còn xung đột.</b></div>
+<p><b>Kết luận:</b> trạng thái reduce = <code>{I2, I4, I6, I7}</code>; trạng thái bị đụng (nếu xét LR(0) chặt) = <code>I1</code> (accept vs shift <code>(</code>), được giải quyết ở mức SLR(1) nhờ <code>FOLLOW(S)={ (, ), $ }</code> và accept chỉ trên <code>$</code>.</p>
+
+<h4>b) Vẽ ít nhất 4 trạng thái của automat LR(1)</h4>
+<p>Item LR(1) có dạng <code>[A→α·β, a]</code> với <code>a</code> là ký hiệu nhìn trước; closure lan truyền lookahead theo <code>FIRST(βa)</code>. Bốn trạng thái đầu:</p>
+<div class="itemsets">
+  <div class="iset"><b>I0 (LR1)</b>[S'→·S,      $ ]
+[S →·S P,   $ , ( ]
+[S →·P,     $ , ( ]
+[P →·(S),   $ , ( ]
+[P →·( ),   $ , ( ]</div>
+  <div class="iset"><b>I1 = goto(I0,S)</b>[S'→S·,     $ ]   <i>(accept)</i>
+[S →S·P,    $ , ( ]
+[P →·(S),   $ , ( ]
+[P →·( ),   $ , ( ]</div>
+  <div class="iset"><b>I2 = goto(I0,P)</b>[S →P·,     $ , ( ]
+   <i>(reduce S→P khi
+    nhìn trước ∈ { $ , ( })</i></div>
+  <div class="iset"><b>I3 = goto(I0,&lsquo;(&rsquo;)</b>[P →(·S),   $ , ( ]
+[P →(·),    $ , ( ]
+[S →·S P,   ) , ( ]
+[S →·P,     ) , ( ]
+[P →·(S),   ) , ( ]
+[P →·( ),   ) , ( ]</div>
+</div>
+<p><b>Giải thích lookahead:</b> ở <code>I2</code>, reduce <code>S→P</code> chỉ hợp lệ khi ký hiệu kế thuộc <code>{$, (}</code> (đúng là <code>FOLLOW</code> tại ngữ cảnh này). Ở <code>I3</code>, các item nội bộ có lookahead <code>)</code> vì sau <code>S</code> trong <code>P→(S·)</code> sẽ là <code>)</code>. Nhờ lookahead riêng từng trạng thái, LR(1) reduce chính xác hơn LR(0)/SLR(1). Nếu sau này hai trạng thái LR(1) trùng <b>lõi</b> (core) mà chỉ khác lookahead thì gộp lại được thành trạng thái <b>LALR(1)</b>.</p>
 
 <!-- ---------- CHECKLIST ---------- -->
 <h2 id="checklist">Checklist ôn thi nhanh</h2>
