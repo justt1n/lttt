@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tài liệu ôn tập – Lý thuyết Tính toán & Chương 7 (Compiler)</title>
+<style>
+  :root{
+    --fg:#1a1a1a; --muted:#5b6472; --bg:#ffffff; --card:#f7f8fa;
+    --accent:#1f5fae; --accent2:#0e7a5f; --line:#d9dee6; --code:#f2f4f8;
+    --warn:#b8460e; --hl:#fff6d6; --hlborder:#e6c34a;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    color:var(--fg); background:var(--bg); line-height:1.62; margin:0;
+    font-size:16px;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:40px 28px 90px;}
+  h1{font-size:2rem; line-height:1.2; margin:0 0 6px; letter-spacing:-.3px}
+  h2{font-size:1.5rem; margin:52px 0 10px; padding-bottom:8px; border-bottom:2px solid var(--accent); color:var(--accent)}
+  h3{font-size:1.2rem; margin:34px 0 8px; color:var(--accent2)}
+  h4{font-size:1.03rem; margin:20px 0 6px; color:#333}
+  p{margin:8px 0}
+  .lead{color:var(--muted); font-size:1.02rem}
+  a{color:var(--accent); text-decoration:none}
+  a:hover{text-decoration:underline}
+  code,kbd{font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace; font-size:.92em}
+  code{background:var(--code); padding:1px 5px; border-radius:4px}
+  .grammar,pre.mono{
+    font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;
+    background:var(--code); border:1px solid var(--line); border-left:4px solid var(--accent);
+    border-radius:6px; padding:12px 16px; margin:12px 0; font-size:.9rem; line-height:1.5;
+    overflow-x:auto; white-space:pre; tab-size:2;
+  }
+  .steps{margin:10px 0 10px 0; padding-left:0; counter-reset:st; list-style:none}
+  .steps>li{position:relative; padding:6px 0 6px 40px; margin:2px 0; border-bottom:1px dashed var(--line)}
+  .steps>li:last-child{border-bottom:none}
+  .steps>li::before{
+    counter-increment:st; content:"B"counter(st); position:absolute; left:0; top:6px;
+    background:var(--accent); color:#fff; font-size:.72rem; font-weight:700;
+    width:28px; height:22px; border-radius:5px; display:flex; align-items:center; justify-content:center;
+  }
+  .note,.warn,.def,.tip{border-radius:8px; padding:12px 16px; margin:14px 0; font-size:.96rem}
+  .note{background:#eef4fc; border:1px solid #cfe0f5}
+  .def{background:#eefaf4; border:1px solid #c8ecdd}
+  .warn{background:#fdf1e8; border:1px solid #f4d3ba}
+  .tip{background:var(--hl); border:1px solid var(--hlborder)}
+  .note b,.def b,.warn b,.tip b{color:inherit}
+  table{border-collapse:collapse; width:100%; margin:14px 0; font-size:.9rem; overflow:hidden}
+  .tblwrap{overflow-x:auto; margin:14px 0}
+  .tblwrap table{margin:0}
+  th,td{border:1px solid var(--line); padding:6px 10px; text-align:center; vertical-align:middle}
+  th{background:var(--accent); color:#fff; font-weight:600}
+  td.rowh,th.rowh{background:var(--card); font-weight:700; color:var(--accent)}
+  td.hl{background:var(--hl)}
+  td.no{color:#b00; background:#fdecec}
+  .itemsets{display:flex; flex-wrap:wrap; gap:12px; margin:14px 0}
+  .iset{border:1px solid var(--line); border-top:3px solid var(--accent2); border-radius:6px; background:var(--card);
+        padding:8px 12px; font-family:"SF Mono",ui-monospace,Menlo,monospace; font-size:.82rem; min-width:150px; line-height:1.45}
+  .iset b{display:block; color:var(--accent2); font-family:inherit; margin-bottom:4px; font-size:.85rem}
+  .toc{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px 22px; margin:26px 0}
+  .toc h2{border:none; margin:0 0 10px; color:var(--fg); font-size:1.15rem; padding:0}
+  .toc ol{margin:0; padding-left:22px}
+  .toc ol ol{padding-left:20px; margin:2px 0}
+  .toc li{margin:3px 0}
+  .toc a{color:#2a3543}
+  .badge{display:inline-block; font-size:.7rem; font-weight:700; padding:2px 8px; border-radius:20px;
+         background:var(--accent2); color:#fff; vertical-align:middle; margin-left:6px}
+  .src{font-size:.8rem; color:var(--muted); font-style:italic; margin:4px 0 12px}
+  hr{border:none; border-top:1px solid var(--line); margin:34px 0}
+  .kpi{color:var(--accent); font-weight:700}
+  .center{text-align:center}
+  .small{font-size:.85rem; color:var(--muted)}
+  .foot{margin-top:60px; padding-top:18px; border-top:1px solid var(--line); color:var(--muted); font-size:.85rem}
+  @media print{
+    body{font-size:11.5pt}
+    .wrap{max-width:none; padding:0 8mm}
+    a{color:var(--fg); text-decoration:none}
+    h2{page-break-before:always; margin-top:0}
+    h2#tong-quan, h2:first-of-type{page-break-before:avoid}
+    h3,h4{page-break-after:avoid}
+    .grammar,pre,table,.iset,.itemsets,.note,.def,.warn,.tip{page-break-inside:avoid}
+    .toc{page-break-after:always}
+    .noprint{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Lý thuyết Tính toán — Ôn tập &amp; Các dạng bài tập</h1>
+<p class="lead">Chương 7: Ứng dụng — Trình biên dịch (Compiler) &amp; nền tảng Automata. Tổng hợp lý thuyết cần biết, phương pháp giải và bài giải mẫu bám sát các bài trong thư mục <code>bt</code>.</p>
+<p class="small">Cấu trúc mỗi dạng: <b>① Lý thuyết cần biết → ② Các bước làm → ③ Bài giải mẫu.</b> &nbsp;•&nbsp; Mẹo in PDF: mở file trong trình duyệt rồi <kbd>Cmd/Ctrl + P</kbd> → <i>Save as PDF</i>.</p>
+
+<!-- ============ MỤC LỤC ============ -->
+<nav class="toc noprint-ok">
+  <h2>Mục lục</h2>
+  <ol>
+    <li><a href="#tong-quan">Tổng quan &amp; bản đồ kiến thức</a></li>
+    <li><a href="#phan-a"><b>PHẦN A — Nền tảng Automata &amp; Ngôn ngữ chính quy</b></a>
+      <ol>
+        <li><a href="#a1">A1. DFA/NFA: định nghĩa, xây dựng, xác định L(M)</a></li>
+        <li><a href="#a2">A2. Biểu thức chính quy &amp; các phép toán trên ngôn ngữ</a></li>
+        <li><a href="#a3">A3. Chuyển đổi: RegEx→NFA, NFA→DFA, NFA→RegEx</a></li>
+        <li><a href="#a4">A4. Bổ đề bơm — chứng minh ngôn ngữ KHÔNG chính quy</a></li>
+      </ol>
+    </li>
+    <li><a href="#phan-b"><b>PHẦN B — Compiler: Phân tích cú pháp</b></a>
+      <ol>
+        <li><a href="#b1">B1. Văn phạm phi ngữ cảnh: dẫn xuất &amp; cây phân tích</a></li>
+        <li><a href="#b2">B2. Nhập nhằng (ambiguity) &amp; khử nhập nhằng</a></li>
+        <li><a href="#b3">B3. Tính tập FIRST và FOLLOW</a></li>
+        <li><a href="#b4">B4. Bảng phân tích LL(1) &amp; kiểm tra văn phạm LL(1)</a></li>
+        <li><a href="#b5">B5. Phân tích bottom-up: item, handle, automat LR(0)</a></li>
+        <li><a href="#b6">B6. Bảng SLR(1)</a></li>
+        <li><a href="#b7">B7. LR(1) &amp; LALR(1)</a></li>
+        <li><a href="#b8">B8. Phân cấp năng lực LL(1) &lt; LR(0) &lt; SLR(1) &lt; LALR(1) &lt; LR(1)</a></li>
+        <li><a href="#b9">B9. Dịch trực tiếp cú pháp (Syntax-Directed Translation)</a></li>
+      </ol>
+    </li>
+    <li><a href="#checklist">Checklist ôn thi nhanh</a></li>
+  </ol>
+</nav>
+
+<!-- ============ TỔNG QUAN ============ -->
+<h2 id="tong-quan">Tổng quan &amp; bản đồ kiến thức</h2>
+<p>Một trình biên dịch xử lý mã nguồn qua các pha; hai pha đầu là trọng tâm của môn học và của các bài trong <code>bt</code>:</p>
+<pre class="mono">Mã nguồn
+   │  ┌─────────────────────┐
+   ├─▶│ Phân tích TỪ VỰNG   │  (Lexical)  — dùng RegEx / DFA-NFA  → chuỗi token
+   │  └─────────────────────┘
+   │  ┌─────────────────────┐
+   ├─▶│ Phân tích CÚ PHÁP   │  (Syntax)   — dùng CFG + LL(1)/LR   → cây phân tích
+   │  └─────────────────────┘
+   │  ┌─────────────────────┐
+   └─▶│ Dịch trực tiếp CP   │  (SDT)      — thuộc tính + hành vi  → mã trung gian
+      └─────────────────────┘</pre>
+<div class="note"><b>Mối liên hệ cốt lõi:</b> RegEx ⇔ NFA ⇔ DFA cùng nhận diện lớp <i>ngôn ngữ chính quy</i> (dùng cho từ vựng). Văn phạm phi ngữ cảnh (CFG) mạnh hơn, nhận diện <i>ngôn ngữ phi ngữ cảnh</i> (dùng cho cú pháp). Bổ đề bơm là công cụ chứng minh một ngôn ngữ <b>vượt khỏi</b> lớp chính quy.</p>
+
+<!-- =================================================================== -->
+<!-- PHẦN A -->
+<!-- =================================================================== -->
+<h2 id="phan-a">PHẦN A — Nền tảng Automata &amp; Ngôn ngữ chính quy</h2>
+
+<!-- ---------- A1 ---------- -->
+<h3 id="a1">A1. DFA/NFA: định nghĩa, xây dựng, xác định L(M)</h3>
+<p class="src">Nguồn bt: trang “I. DFAs and NFAs”, ví dụ automat chẵn/lẻ số 0, phép toán tập AB/BB/BBB.</p>
+
+<h4>① Lý thuyết cần biết</h4>
+<div class="def">
+<b>Ôtômát hữu hạn (Finite Automaton)</b> là bộ 5: <code>M = (Q, Σ, δ, q₀, F)</code>
+<ul style="margin:6px 0">
+  <li><code>Q</code> — tập hữu hạn các <b>trạng thái</b>.</li>
+  <li><code>Σ</code> — bảng chữ cái (tập ký hiệu nhập).</li>
+  <li><code>δ</code> — hàm chuyển trạng thái. DFA: <code>δ: Q×Σ → Q</code> (đơn định, đúng 1 đích). NFA: <code>δ: Q×(Σ∪{ε}) → 2^Q</code> (không đơn định, ra 1 tập trạng thái).</li>
+  <li><code>q₀ ∈ Q</code> — trạng thái bắt đầu.</li>
+  <li><code>F ⊆ Q</code> — tập trạng thái kết thúc (chấp nhận).</li>
+</ul>
+<code>L(M)</code> = ngôn ngữ của máy = tập mọi chuỗi được <code>M</code> chấp nhận (đọc hết chuỗi và dừng ở trạng thái thuộc F).
+</div>
+<p><b>Phân biệt DFA vs NFA:</b> DFA mỗi (trạng thái, ký hiệu) có đúng một đích; NFA có thể có 0, 1 hay nhiều đích và cho phép cạnh ε. Hai loại có cùng năng lực (đều nhận diện ngôn ngữ chính quy).</p>
+
+<h4>② Các bước làm (xây automat cho một ngôn ngữ)</h4>
+<ol class="steps">
+  <li>Xác định “trạng thái nhớ điều gì” — thường là lượng thông tin đủ để quyết định chấp nhận (vd: chẵn/lẻ, số dư, đã thấy mẫu con nào).</li>
+  <li>Chọn q₀ ứng với trạng thái ban đầu (chuỗi rỗng) và đánh dấu F ứng với điều kiện chấp nhận.</li>
+  <li>Với mỗi trạng thái, vẽ cạnh cho <b>từng</b> ký hiệu của Σ (DFA phải đầy đủ).</li>
+  <li>Thử lại bằng vài chuỗi thuộc / không thuộc ngôn ngữ.</li>
+</ol>
+
+<h4>③ Bài giải mẫu</h4>
+<p><b>Đề:</b> Xây DFA trên <code>Σ={0,1}</code> nhận diện <code>L = {w | w có số lượng ký hiệu 0 là số chẵn}</code>. Xác định L(M).</p>
+<p><b>Giải.</b> Trạng thái chỉ cần nhớ “số 0 đã đọc là chẵn hay lẻ” → 2 trạng thái.</p>
+<pre class="mono">        1               1
+      ┌───┐           ┌───┐
+      ▼   │           ▼   │
+ →((chẵn))──0──▶( lẻ )
+       ▲           │
+       └─────0─────┘
+q₀ = chẵn (cũng là trạng thái chấp nhận), F = {chẵn}</pre>
+<div class="tblwrap">
+<table>
+<tr><th>δ</th><th>0</th><th>1</th></tr>
+<tr><td class="rowh">→ *chẵn</td><td>lẻ</td><td>chẵn</td></tr>
+<tr><td class="rowh">lẻ</td><td>chẵn</td><td>lẻ</td></tr>
+</table>
+</div>
+<p>Ký hiệu <code>1</code> không đổi trạng thái (không ảnh hưởng số 0); ký hiệu <code>0</code> lật chẵn↔lẻ. Chuỗi rỗng có 0 số 0 (chẵn) → được chấp nhận. Vậy <code class="kpi">L(M) = {w ∈ {0,1}* | số ký hiệu 0 trong w là chẵn}</code>. Kiểm tra: <code>101</code> (một số 0 → lẻ, từ chối), <code>1001</code> (hai số 0 → chấp nhận). ✓</p>
+
+<div class="note"><b>Phép toán trên tập/ngôn ngữ (ôn kèm):</b> với <code>A={1,2,3}, B={a,b}</code>:
+<code>AB = {1a,1b,2a,2b,3a,3b}</code> (ghép), <code>BB = {aa,ab,ba,bb}</code>, <code>BBB</code> gồm 8 chuỗi độ dài 3. Ba phép toán chính trên ngôn ngữ: <b>hợp</b> <code>A∪B</code>, <b>ghép</b> <code>A·B</code>, <b>sao Kleene</b> <code>A*</code>.</div>
+
+<!-- ---------- A2 ---------- -->
+<h3 id="a2">A2. Biểu thức chính quy &amp; các phép toán trên ngôn ngữ</h3>
+<p class="src">Nguồn bt: trang “Regular Expression”, các đồng nhất thức R∪∅, R·∅.</p>
+
+<h4>① Lý thuyết cần biết</h4>
+<div class="def">
+<b>Biểu thức chính quy (RegEx)</b> trên Σ định nghĩa đệ quy: <code>∅</code>, <code>ε</code>, và mỗi <code>a∈Σ</code> là RegEx; nếu <code>R, S</code> là RegEx thì <code>R∪S</code> (hoặc <code>R|S</code>), <code>R·S</code>, <code>R*</code> cũng là RegEx.
+</div>
+<p>Định lý Kleene: <code>L</code> là ngôn ngữ chính quy ⇔ tồn tại DFA/NFA nhận diện <code>L</code> ⇔ tồn tại RegEx sinh ra <code>L</code>.</p>
+<p><b>Đồng nhất thức hay dùng:</b></p>
+<pre class="mono">R ∪ ∅ = R          R · ε = R          (R*)* = R*
+R · ∅ = ∅          ∅*   = ε          R ∪ R = R
+ε ∪ R R* = R*      (R∪S)* ⊇ R*∪S*</pre>
+
+<h4>② Các bước làm (viết RegEx từ mô tả)</h4>
+<ol class="steps">
+  <li>Tách ngôn ngữ thành các “khối” lặp / lựa chọn độc lập.</li>
+  <li>Mỗi khối lặp tùy ý → dùng <code>*</code>; lựa chọn → dùng <code>∪</code>; nối tiếp → ghép.</li>
+  <li>Ghép các khối theo đúng thứ tự xuất hiện.</li>
+</ol>
+
+<h4>③ Bài giải mẫu</h4>
+<p><b>Đề:</b> Trên <code>Σ={0,1}</code>, viết RegEx cho <code>L = {w | w bắt đầu bằng 1}</code> và cho <code>L₂ = {"0","01"}</code>.</p>
+<p><b>Giải.</b> “Bắt đầu bằng 1, phía sau tùy ý”: <code class="kpi">1(0∪1)*</code>. Tập hữu hạn <code>L₂ = {"0","01"}</code>: liệt kê bằng hợp → <code class="kpi">0 ∪ 01</code> = <code>0(ε∪1)</code>.</p>
+<div class="tip"><b>Mẹo:</b> “chứa mẫu <code>111</code>” → <code>(0∪1)*111(0∪1)*</code>; “kết thúc bằng <code>0</code>” → <code>(0∪1)*0</code>; “độ dài chẵn” → <code>((0∪1)(0∪1))*</code>.</div>
+
+<!-- ---------- A3 ---------- -->
+<h3 id="a3">A3. Chuyển đổi: RegEx→NFA, NFA→DFA, NFA→RegEx</h3>
+<p class="src">Nguồn bt: xây NFA cho σ/ε/∅ và R=a*b∪a; xây tập con chạy “1110”; khử trạng thái cho a*b(a∪b)*, a(b∪c∪d).</p>
+
+<h4>A3.1 — RegEx → NFA (xây dựng Thompson)</h4>
+<p>Quy tắc gốc và ghép:</p>
+<pre class="mono">σ (một ký hiệu):   →(q0) ──σ──▶ ((q1))
+ε (rỗng):          →((q0))                 (bắt đầu = chấp nhận)
+∅ (rỗng tuyệt đối):→(q0)    ((q1))         (không có đường tới chấp nhận)
+
+R∪S:  từ qstart có 2 cạnh ε tới NFA(R) và NFA(S), gộp kết thúc bằng ε.
+R·S:  nối trạng thái chấp nhận của NFA(R) --ε--> trạng thái đầu NFA(S).
+R*:   thêm qstart/qend, cạnh ε: start→R, R→start (lặp), start→end (rỗng).</pre>
+<p><b>Ví dụ:</b> <code>R = a*b ∪ a</code>. Nhánh trên là <code>a*b</code> (vòng ε cho <code>a*</code> rồi ghép <code>b</code>), nhánh dưới là <code>a</code>; hai nhánh nối bằng ε từ <code>qstart</code> và về <code>qend</code>. Đây đúng dạng “tạo NFA-ε rồi mới khử ε / xây tập con”.</p>
+
+<h4>A3.2 — NFA → DFA (xây dựng tập con — Subset construction)</h4>
+<ol class="steps">
+  <li>Trạng thái DFA = <b>tập con</b> của Q (nếu có ε thì lấy ε-closure). Bắt đầu từ <code>{q₀}</code> (ε-closure).</li>
+  <li>Với mỗi tập <code>T</code> và mỗi ký hiệu <code>a</code>: tập đích = <code>⋃<sub>q∈T</sub> δ(q,a)</code> (rồi ε-closure).</li>
+  <li>Lặp cho tới khi không sinh tập mới. Trạng thái chấp nhận DFA = mọi tập <b>chứa ít nhất một</b> trạng thái chấp nhận của NFA.</li>
+</ol>
+<p><b>Đề (bt):</b> NFA nhận diện “chuỗi chứa <code>111</code>”: <code>q₀</code> tự lặp <code>0,1</code>; <code>q₀→<sup>1</sup>q₁→<sup>1</sup>q₂→<sup>1</sup>q₃</code>; <code>q₃</code> tự lặp <code>0,1</code>; chấp nhận <code>q₃</code>. Hãy xây DFA và chạy thử <code>1110</code>.</p>
+<div class="tblwrap">
+<table>
+<tr><th>Tập con (trạng thái DFA)</th><th>trên 0</th><th>trên 1</th><th>chấp nhận?</th></tr>
+<tr><td class="rowh">→ {q₀}</td><td>{q₀}</td><td>{q₀,q₁}</td><td>không</td></tr>
+<tr><td class="rowh">{q₀,q₁}</td><td>{q₀}</td><td>{q₀,q₁,q₂}</td><td>không</td></tr>
+<tr><td class="rowh">{q₀,q₁,q₂}</td><td>{q₀}</td><td>{q₀,q₁,q₂,q₃}</td><td>không</td></tr>
+<tr><td class="rowh">{q₀,q₁,q₂,q₃}</td><td>{q₀,q₃}</td><td>{q₀,q₁,q₂,q₃}</td><td class="hl"><b>có</b></td></tr>
+<tr><td class="rowh">{q₀,q₃}</td><td>{q₀,q₃}</td><td>{q₀,q₁,q₃}</td><td class="hl"><b>có</b></td></tr>
+<tr><td class="rowh">{q₀,q₁,q₃}</td><td>{q₀,q₃}</td><td>{q₀,q₁,q₂,q₃}</td><td class="hl"><b>có</b></td></tr>
+</table>
+</div>
+<p><b>Chạy <code>1110</code>:</b> <code>{q₀} →<sup>1</sup> {q₀,q₁} →<sup>1</sup> {q₀,q₁,q₂} →<sup>1</sup> {q₀,q₁,q₂,q₃} →<sup>0</sup> {q₀,q₃}</code>. Kết thúc ở <code>{q₀,q₃}</code> có chứa <code>q₃</code> → <b>chấp nhận</b> ✓ (đúng vì <code>1110</code> chứa <code>111</code>).</p>
+
+<h4>A3.3 — NFA → RegEx (khử trạng thái / GNFA)</h4>
+<ol class="steps">
+  <li>Thêm <code>qstart</code> mới nối ε tới trạng thái đầu cũ, và <code>qend</code> mới nhận ε từ mọi trạng thái chấp nhận cũ.</li>
+  <li>Lần lượt <b>xóa</b> từng trạng thái trung gian <code>q</code>: với mọi cặp cạnh vào <code>a·(vòng q)*·</code> ra, cộng nhãn <code>a (self)* c</code> vào cạnh trực tiếp; vòng tự lặp của <code>q</code> đưa vào dấu <code>*</code>.</li>
+  <li>Khi chỉ còn <code>qstart → qend</code>, nhãn cạnh chính là RegEx.</li>
+</ol>
+<p><b>Ví dụ 1:</b> NFA: <code>q₀</code> lặp <code>a</code>, <code>q₀→<sup>b</sup>q₁</code>, <code>q₁</code> lặp <code>a,b</code>, <code>q₁</code> chấp nhận. Khử <code>q₀</code> rồi <code>q₁</code> ⇒ <code class="kpi">a*b(a∪b)*</code>.</p>
+<p><b>Ví dụ 2 (bt – nhiều nhánh):</b> <code>q₁→<sup>a</sup>q₂</code>; từ <code>q₂</code> có <code>b→q₄</code>, <code>c→q₃</code>, <code>d→q₅</code>; ba nhánh ε về <code>qend</code>. Gộp lại ⇒ <code class="kpi">a(b∪c∪d)</code>.</p>
+<div class="tip"><b>Ghi nhớ ba thao tác khi khử:</b> cạnh nối tiếp → <b>ghép</b>; vòng tự lặp tại nút bị xóa → <b>sao (*)</b>; nhiều cạnh song song cùng cặp đỉnh → <b>hợp (∪)</b>.</div>
+
+<!-- ---------- A4 ---------- -->
+<h3 id="a4">A4. Bổ đề bơm — chứng minh ngôn ngữ KHÔNG chính quy</h3>
+<p class="src">Nguồn bt: “Pumping Lemma Example”, các ví dụ L={a^p b^p}, L={w:|w|=2ⁿ}.</p>
+
+<h4>① Lý thuyết cần biết</h4>
+<div class="def"><b>Bổ đề bơm (Pumping Lemma).</b> Nếu <code>L</code> chính quy thì <b>tồn tại</b> hằng số <code>p&gt;0</code> sao cho <b>mọi</b> chuỗi <code>s∈L</code> với <code>|s|≥p</code> đều <b>tách được</b> thành <code>s = xyz</code> thỏa:
+<ol style="margin:6px 0">
+  <li><code>|y| ≥ 1</code> (tức <code>y ≠ ε</code>),</li>
+  <li><code>|xy| ≤ p</code>,</li>
+  <li><code>xyⁿz ∈ L</code> với <b>mọi</b> <code>n ≥ 0</code>.</li>
+</ol></div>
+<div class="warn"><b>Dùng để chứng minh KHÔNG chính quy (phản chứng):</b> giả sử L chính quy → có p. Ta <b>chọn khéo</b> một <code>s∈L, |s|≥p</code>. Với <b>mọi</b> cách tách <code>xyz</code> hợp lệ (điều kiện 1–2), ta tìm <b>một</b> giá trị <code>n</code> khiến <code>xyⁿz ∉ L</code> ⇒ mâu thuẫn.</div>
+
+<h4>② Các bước làm</h4>
+<ol class="steps">
+  <li>Giả sử L chính quy, gọi <code>p</code> là hằng số bơm.</li>
+  <li>Chọn chuỗi <code>s∈L</code> phụ thuộc <code>p</code> sao cho điều kiện <code>|xy|≤p</code> ép <code>y</code> rơi vào vùng “nhạy cảm”.</li>
+  <li>Do <code>|xy|≤p</code>, chỉ ra <code>y</code> gồm ký hiệu gì (thường là toàn <code>a</code>).</li>
+  <li>Bơm với <code>n=0</code> hoặc <code>n=2</code> để phá vỡ ràng buộc đếm ⇒ chuỗi mới ∉ L ⇒ mâu thuẫn.</li>
+</ol>
+
+<h4>③ Bài giải mẫu</h4>
+<p><b>Đề:</b> Chứng minh <code>L = {aⁿbⁿ | n ≥ 0}</code> không chính quy.</p>
+<p><b>Giải.</b> Giả sử L chính quy, có hằng số bơm <code>p</code>. Chọn <code class="kpi">s = a<sup>p</sup>b<sup>p</sup> ∈ L</code>, <code>|s| = 2p ≥ p</code>. Theo bổ đề, <code>s = xyz</code> với <code>|y|≥1</code> và <code>|xy|≤p</code>. Vì <code>p</code> ký hiệu đầu của <code>s</code> đều là <code>a</code> nên <code>|xy|≤p</code> ⇒ <code>x,y</code> chỉ gồm <code>a</code>, tức <code>y = a<sup>k</sup></code> với <code>k = |y| ≥ 1</code>.</p>
+<p>Bơm <code>n=2</code>: <code>xy²z = a<sup>p+k</sup>b<sup>p</sup></code>. Vì <code>k≥1</code> nên số <code>a</code> (<code>p+k</code>) khác số <code>b</code> (<code>p</code>) ⇒ <code>xy²z ∉ L</code>. Mâu thuẫn với điều kiện 3 ⇒ <b>L không chính quy.</b> ∎</p>
+<div class="note"><b>Biến thể trong bt — <code>L = {w | |w| = 2ⁿ, n≥0}</code>:</b> chọn <code>s∈L</code> với <code>|s| = 2<sup>p</sup> ≥ p</code>. Với mọi cách tách, <code>1 ≤ |y| ≤ |xy| ≤ p</code>. Bơm <code>n=2</code>: <code>|xy²z| = 2<sup>p</sup> + |y|</code>, mà <code>2<sup>p</sup> &lt; 2<sup>p</sup>+|y| ≤ 2<sup>p</sup>+p &lt; 2<sup>p</sup>+2<sup>p</sup> = 2<sup>p+1</sup></code>. Vậy độ dài nằm <b>giữa hai lũy thừa 2 liên tiếp</b> nên không thể là <code>2ⁿ</code> ⇒ <code>xy²z ∉ L</code> ⇒ mâu thuẫn.</div>
+
+<!-- =================================================================== -->
+<!-- PHẦN B -->
+<!-- =================================================================== -->
+<h2 id="phan-b">PHẦN B — Compiler: Phân tích cú pháp</h2>
+
+<!-- ---------- B1 ---------- -->
+<h3 id="b1">B1. Văn phạm phi ngữ cảnh: dẫn xuất &amp; cây phân tích</h3>
+<p class="src">Nguồn bt: Câu 1 — S → aSb | bSa | SS | ε.</p>
+
+<h4>① Lý thuyết cần biết</h4>
+<div class="def"><b>Văn phạm phi ngữ cảnh (CFG)</b> là bộ 4: <code>G=(V, T, P, S)</code> — biến (V), ký hiệu kết thúc (T), luật sinh (P) dạng <code>A→α</code>, ký hiệu bắt đầu (S).</div>
+<ul>
+  <li><b>Dẫn xuất trái nhất (leftmost):</b> mỗi bước thay biến <b>trái nhất</b>.</li>
+  <li><b>Cây phân tích:</b> gốc = S, lá đọc từ trái sang phải = chuỗi sinh ra. Một cây ⇔ đúng một dẫn xuất trái nhất.</li>
+</ul>
+
+<h4>② Các bước làm</h4>
+<ol class="steps">
+  <li>Bắt đầu từ S, mỗi bước chọn luật thay biến trái nhất sao cho dần khớp chuỗi đích.</li>
+  <li>Ghi lại dãy <code>S ⇒ … ⇒ w</code>; dựng cây tương ứng.</li>
+</ol>
+
+<h4>③ Bài giải mẫu</h4>
+<p><b>Đề:</b> Cho <code>S → aSb | bSa | SS | ε</code>. Chỉ ra một dẫn xuất trái nhất sinh chuỗi <code>aabb</code> và vẽ cây phân tích.</p>
+<p><b>Giải.</b> <code class="kpi">S ⇒ aSb ⇒ a·aSb·b ⇒ a·a·ε·b·b = aabb</code> (dùng <code>S→aSb</code> hai lần rồi <code>S→ε</code>).</p>
+<pre class="mono">          S
+    ┌─────┼─────┐
+    a     S     b
+    ┌─────┼─────┐
+    a     S     b
+          │
+          ε</pre>
+<div class="tip"><b>Ghi nhớ:</b> luật <code>S→aSb</code> luôn sinh dạng “tiền tố a … hậu tố b cân bằng”; luật <code>SS</code> cho phép <b>ghép hai chuỗi con</b> — chính nó tạo ra sự nhập nhằng (xem B2).</div>
+
+<!-- ---------- B2 ---------- -->
+<h3 id="b2">B2. Nhập nhằng (ambiguity) &amp; khử nhập nhằng</h3>
+<p class="src">Nguồn bt: Câu 1b–c; trang “Mã hồ và cách khử mã hồ” (E → *E | E[E] | id).</p>
+
+<h4>① Lý thuyết cần biết</h4>
+<div class="def"><b>Văn phạm nhập nhằng</b> = tồn tại <b>một</b> chuỗi có <b>≥2 cây phân tích</b> (tương đương ≥2 dẫn xuất trái nhất) khác nhau.</div>
+<p><b>Khử nhập nhằng</b> thường bằng <b>phân tầng</b> (stratification) để áp đặt:
+<b>độ ưu tiên</b> (toán tử ưu tiên cao đặt ở tầng trong/dưới) và <b>tính kết hợp</b> (trái/phải, quyết định bởi vị trí đệ quy).</p>
+
+<h4>② Các bước làm</h4>
+<ol class="steps">
+  <li><b>Chứng minh nhập nhằng:</b> tìm 1 chuỗi rồi vẽ 2 cây (hoặc viết 2 dẫn xuất trái nhất) khác nhau.</li>
+  <li><b>Khử:</b> tách mỗi mức ưu tiên thành một biến (E cho +, T cho ×, F cho hạng tử/ngoặc).</li>
+  <li>Đặt đệ quy trái (<code>E→E+T</code>) cho kết hợp trái; đệ quy phải cho kết hợp phải.</li>
+</ol>
+
+<h4>③ Bài giải mẫu</h4>
+<p><b>(a) Chứng minh <code>S → aSb | bSa | SS | ε</code> nhập nhằng.</b> Xét chuỗi <code>ab</code>. Hai dẫn xuất trái nhất khác nhau:</p>
+<div class="itemsets">
+  <div class="iset"><b>Cây 1</b>S ⇒ aSb ⇒ ab
+(dùng S→aSb rồi S→ε)</div>
+  <div class="iset"><b>Cây 2</b>S ⇒ SS ⇒ aSb·S ⇒ ab·S ⇒ ab
+(S→SS; S₁→aSb→ab; S₂→ε)</div>
+</div>
+<p>Cùng sinh <code>ab</code> nhưng hai cây khác nhau ⇒ <b>văn phạm nhập nhằng</b>. (Nguồn nhập nhằng: luật <code>S→SS</code> kết hợp với <code>S→ε</code> cho phép chèn/ghép chuỗi rỗng tùy ý.)</p>
+
+<p><b>(b) Khử nhập nhằng — ví dụ chuẩn về biểu thức số học.</b> Văn phạm nhập nhằng kinh điển:</p>
+<pre class="mono">E → E + E | E * E | ( E ) | id        (nhập nhằng: id+id*id có 2 cây)</pre>
+<p>Chuỗi <code>id+id*id</code> có 2 cây (một cây nhân trước, một cây cộng trước). Khử bằng phân tầng ⇒ áp đặt <code>*</code> ưu tiên hơn <code>+</code>, cả hai kết hợp trái:</p>
+<pre class="mono">E → E + T | T          (tầng cộng, đệ quy trái ⇒ + kết hợp trái)
+T → T * F | F          (tầng nhân, ưu tiên cao hơn +)
+F → ( E ) | id         (hạng tử)</pre>
+<p>Nay <code>id+id*id</code> chỉ còn <b>một</b> cây: <code>T*F</code> gộp trước, rồi <code>E+T</code>. Đây chính là ý tưởng “phân tầng” trong bt (bản bt dùng toán tử <code>*</code> tiền tố và <code>[ ]</code>: <code>E→*T|T</code>, <code>T→T[E]|id</code> — cùng nguyên tắc tách tầng theo độ ưu tiên).</p>
+
+<!-- ---------- B3 ---------- -->
+<h3 id="b3">B3. Tính tập FIRST và FOLLOW</h3>
+<p class="src">Nguồn bt: quy tắc FIRST/FOLLOW; văn phạm Num→Sign Digits…, E→TY…</p>
+
+<h4>① Lý thuyết cần biết</h4>
+<div class="def">
+<b>FIRST(α)</b> = tập ký hiệu kết thúc có thể đứng <b>đầu</b> một chuỗi dẫn xuất từ α (kèm <code>ε</code> nếu α ⇒* ε).<br>
+<b>FOLLOW(A)</b> = tập ký hiệu kết thúc có thể đứng <b>ngay sau</b> A trong một dạng câu; <code>$</code> ∈ FOLLOW(S).
+</div>
+<p><b>Quy tắc FIRST:</b></p>
+<pre class="mono">• A → a…      ⇒ a ∈ FIRST(A)                (bắt đầu bằng ký hiệu kết thúc)
+• A → ε       ⇒ ε ∈ FIRST(A)
+• A → B₁B₂…Bₖ ⇒ thêm FIRST(B₁)\{ε}; nếu ε∈FIRST(B₁) thì xét tiếp B₂…;
+               nếu mọi Bᵢ đều ⇒* ε thì ε ∈ FIRST(A)</pre>
+<p><b>Quy tắc FOLLOW:</b></p>
+<pre class="mono">• $ ∈ FOLLOW(S)                              (S là ký hiệu bắt đầu)
+• A → αBβ ⇒ thêm FIRST(β)\{ε} vào FOLLOW(B)
+• A → αB   (hoặc A→αBβ với ε∈FIRST(β)) ⇒ thêm FOLLOW(A) vào FOLLOW(B)</pre>
+<p>Cả hai tính bằng <b>lặp đến khi ổn định</b> (không còn thay đổi).</p>
+
+<h4>② Các bước làm</h4>
+<ol class="steps">
+  <li>Tính FIRST cho mọi biến (lặp): xét lần lượt từng luật, áp quy tắc trên.</li>
+  <li>Khởi tạo <code>$∈FOLLOW(S)</code>; duyệt mọi luật <code>A→αBβ</code> áp quy tắc FOLLOW; lặp đến ổn định.</li>
+  <li>Lưu ý biến <b>nullable</b> (⇒* ε) vì nó cho phép “nhìn xuyên qua”.</li>
+</ol>
+
+<h4>③ Bài giải mẫu</h4>
+<p><b>Đề (bt):</b> <code>Num→Sign Digits; Sign→+ | − | ε; Digits→Digit More; More→Digits | ε; Digit→0|1|…|9</code>. Tính FIRST, FOLLOW.</p>
+<div class="tblwrap">
+<table>
+<tr><th>Biến</th><th>FIRST</th><th>FOLLOW</th></tr>
+<tr><td class="rowh">Num</td><td>+ , − , 0–9</td><td>$</td></tr>
+<tr><td class="rowh">Sign</td><td>+ , − , ε</td><td>0–9</td></tr>
+<tr><td class="rowh">Digits</td><td>0–9</td><td>$</td></tr>
+<tr><td class="rowh">More</td><td>0–9 , ε</td><td>$</td></tr>
+<tr><td class="rowh">Digit</td><td>0–9</td><td>0–9 , $</td></tr>
+</table>
+</div>
+<p><b>Giải thích chốt:</b> <code>Sign</code> nullable nên <code>FIRST(Num) = (FIRST(Sign)\{ε}) ∪ FIRST(Digits) = {+,−}∪{0–9}</code>. <code>FOLLOW(Sign)=FIRST(Digits)={0–9}</code> (Sign đứng ngay trước Digits, mà Digits không rỗng). <code>Digit</code> đứng trước <code>More</code> (nullable) nên <code>FOLLOW(Digit)=FIRST(More)\{ε} ∪ FOLLOW(Digits)={0–9}∪{$}</code>. Kết quả trùng khớp bảng viết tay trong bt. ✓</p>
+
+<!-- ---------- B4 ---------- -->
+<h3 id="b4">B4. Bảng phân tích LL(1) &amp; kiểm tra văn phạm LL(1)</h3>
+<p class="src">Nguồn bt: bảng LL(1) cho Num…, STMT/EXPR/TERM, E→T|T+E (khử nhân tố trái → E→TY), S→AB…, S→aB|bA|ε…</p>
+
+<h4>① Lý thuyết cần biết</h4>
+<div class="def"><b>Bảng LL(1)</b> <code>M[A, a]</code>: với luật <code>A→α</code>, điền <code>A→α</code> vào ô <code>M[A, t]</code> cho:
+<ul style="margin:6px 0">
+  <li>mọi <code>t ∈ FIRST(α)\{ε}</code>;</li>
+  <li>nếu <code>ε ∈ FIRST(α)</code>: thêm cho mọi <code>t ∈ FOLLOW(A)</code> (và <code>$</code> nếu <code>$∈FOLLOW(A)</code>).</li>
+</ul></div>
+<div class="warn"><b>Văn phạm là LL(1) ⇔ bảng KHÔNG có ô nào chứa ≥2 luật</b> (không xung đột). Điều kiện tương đương: với mỗi cặp luật <code>A→α | β</code>: (1) <code>FIRST(α)∩FIRST(β)=∅</code>; (2) nếu <code>β⇒*ε</code> thì <code>FIRST(α)∩FOLLOW(A)=∅</code>. <br><b>Cản trở thường gặp:</b> đệ quy trái và chưa khử nhân tố trái (left-factoring).</div>
+
+<h4>② Các bước làm</h4>
+<ol class="steps">
+  <li>Khử đệ quy trái &amp; khử nhân tố trái nếu cần.</li>
+  <li>Tính FIRST cho từng vế phải, FOLLOW cho từng biến.</li>
+  <li>Điền bảng theo quy tắc trên.</li>
+  <li>Nếu có ô ≥2 luật ⇒ <b>không</b> LL(1); nếu không ⇒ là LL(1).</li>
+</ol>
+
+<h4>③ Bài giải mẫu 1 — Kiểm tra &amp; sửa để thành LL(1)</h4>
+<p><b>Đề (bt):</b> <code>E → T | T + E</code>, <code>T → int | ( E )</code>. Có phải LL(1) không?</p>
+<p><b>Phân tích:</b> hai luật của E là <code>E→T</code> và <code>E→T+E</code> đều bắt đầu bằng <code>FIRST(T)={int, (}</code> ⇒ <code>FIRST(T)∩FIRST(T+E) ≠ ∅</code> ⇒ <b>KHÔNG LL(1)</b> (chưa khử nhân tố trái). <b>Khử nhân tố trái</b> phần chung <code>T</code>:</p>
+<pre class="mono">E → T Y
+Y → + E | ε
+T → int | ( E )</pre>
+<div class="tblwrap">
+<table>
+<tr><th></th><th>FIRST</th><th>FOLLOW</th></tr>
+<tr><td class="rowh">E</td><td>int , (</td><td>$ , )</td></tr>
+<tr><td class="rowh">T</td><td>int , (</td><td>+ , $ , )</td></tr>
+<tr><td class="rowh">Y</td><td>+ , ε</td><td>$ , )</td></tr>
+</table>
+</div>
+<p><b>Bảng LL(1)</b> (đánh số luật: 1:E→TY, 2:T→int, 3:T→(E), 4:Y→+E, 5:Y→ε):</p>
+<div class="tblwrap">
+<table>
+<tr><th></th><th>int</th><th>(</th><th>)</th><th>+</th><th>$</th></tr>
+<tr><td class="rowh">E</td><td>1</td><td>1</td><td></td><td></td><td></td></tr>
+<tr><td class="rowh">T</td><td>2</td><td>3</td><td></td><td></td><td></td></tr>
+<tr><td class="rowh">Y</td><td></td><td></td><td>5</td><td>4</td><td>5</td></tr>
+</table>
+</div>
+<p>Không ô nào chứa 2 luật ⇒ văn phạm sau khi sửa <b>là LL(1)</b>. ✓ (trùng slide bt “Tạo nhân tố trái”).</p>
+
+<h4>③ Bài giải mẫu 2 — Bảng đầy đủ cho văn phạm có luật ε</h4>
+<p><b>Đề (bt):</b> <code>Num→Sign Digits; Sign→+|−|ε; Digits→Digit More; More→Digits|ε; Digit→0|…|9</code> (FIRST/FOLLOW đã tính ở B3).</p>
+<div class="tblwrap">
+<table>
+<tr><th></th><th>0–9</th><th>+</th><th>−</th><th>$</th></tr>
+<tr><td class="rowh">Num</td><td>Num→Sign Digits</td><td>Num→Sign Digits</td><td>Num→Sign Digits</td><td></td></tr>
+<tr><td class="rowh">Sign</td><td>Sign→ε</td><td>Sign→+</td><td>Sign→−</td><td></td></tr>
+<tr><td class="rowh">Digits</td><td>Digits→Digit More</td><td></td><td></td><td></td></tr>
+<tr><td class="rowh">More</td><td>More→Digits</td><td></td><td></td><td>More→ε</td></tr>
+<tr><td class="rowh">Digit</td><td>Digit→0…9</td><td></td><td></td><td></td></tr>
+</table>
+</div>
+<p>Chú ý ô <code>M[Sign, 0–9] = Sign→ε</code> nhờ <code>FOLLOW(Sign)={0–9}</code>; ô <code>M[More,$]=More→ε</code> nhờ <code>FOLLOW(More)={$}</code>. Bảng không xung đột ⇒ <b>là LL(1)</b>.</p>
+
+<div class="note"><b>Bẫy “đệ quy trái” (bt: <code>S→aBDz, B→Bv|w,…</code> và <code>A→Ab|c</code>):</b> luật <code>B→Bv</code> là đệ quy trái ⇒ <b>không thể</b> LL(1) trực tiếp. Khử đệ quy trái: <code>B→Bv|w</code> ⇒ <code>B→wB'</code>, <code>B'→vB'|ε</code>. Sau đó mới tính FIRST/FOLLOW và lập bảng.</div>
+
+<!-- ---------- B5 ---------- -->
+<h3 id="b5">B5. Phân tích bottom-up: item, handle, automat LR(0)</h3>
+<p class="src">Nguồn bt: “Handles”, slide “Xây dựng automat đơn định”, Câu 2 (S→SP|P, P→(S)|()).</p>
+
+<h4>① Lý thuyết cần biết</h4>
+<div class="def">
+<b>LR(0) item</b> = một luật có dấu chấm <code>·</code> đánh dấu vị trí đã đọc, vd <code>E → T · + E</code>.<br>
+<b>Handle</b> = đoạn con (vế phải một luật) sẽ được <b>rút gọn (reduce)</b> tiếp theo; nằm ở đỉnh phần “đang xử lý” của ngăn xếp.<br>
+<b>Closure(I):</b> nếu <code>A→α·Bβ ∈ I</code> thì thêm mọi <code>B→·γ</code>.<br>
+<b>Goto(I, X):</b> dời dấu chấm qua <code>X</code> ở mọi item rồi lấy closure.
+</div>
+<ul>
+  <li><b>Trạng thái reduce</b> = trạng thái chứa item <b>hoàn tất</b> <code>A→α·</code> (chấm ở cuối).</li>
+  <li><b>Xung đột LR(0):</b> shift-reduce (một trạng thái vừa có item hoàn tất vừa có thể dịch) hoặc reduce-reduce (hai item hoàn tất khác luật).</li>
+</ul>
+
+<h4>② Các bước làm (xây automat LR(0))</h4>
+<ol class="steps">
+  <li>Bổ sung luật <code>S'→S</code> (augment).</li>
+  <li><code>I₀ = closure(S'→·S)</code>.</li>
+  <li>Lặp: với mỗi trạng thái và mỗi ký hiệu văn phạm, tính <code>Goto</code> → sinh trạng thái mới đến khi đủ.</li>
+  <li>Đánh dấu trạng thái reduce (item hoàn tất) &amp; kiểm tra xung đột.</li>
+</ol>
+
+<h4>③ Bài giải mẫu 1 — Automat LR(0) đầy đủ</h4>
+<p><b>Đề (bt):</b> <code>S→E; E→T; | T+E; T→int | (E)</code>. Xây các tập item.</p>
+<div class="itemsets">
+  <div class="iset"><b>I0 (start)</b>S → · E
+E → · T ;
+E → · T + E
+T → · int
+T → · ( E )</div>
+  <div class="iset"><b>I1 =goto(I0,E)</b>S → E ·   <i>(accept)</i></div>
+  <div class="iset"><b>I2 =goto(I0,T)</b>E → T · ;
+E → T · + E</div>
+  <div class="iset"><b>I3 =goto(I0,int)</b>T → int ·  <i>(reduce)</i></div>
+  <div class="iset"><b>I4 =goto(I0,&lsquo;(&rsquo;)</b>T → ( · E )
+E → · T ;
+E → · T + E
+T → · int
+T → · ( E )</div>
+  <div class="iset"><b>I5 =goto(I2,&lsquo;;&rsquo;)</b>E → T ; ·  <i>(reduce E→T;)</i></div>
+  <div class="iset"><b>I6 =goto(I2,&lsquo;+&rsquo;)</b>E → T + · E
+E → · T ;
+E → · T + E
+T → · int
+T → · ( E )</div>
+  <div class="iset"><b>I7 =goto(I6,E)</b>E → T + E ·  <i>(reduce E→T+E)</i></div>
+  <div class="iset"><b>I8 =goto(I4,E)</b>T → ( E · )</div>
+  <div class="iset"><b>I9 =goto(I8,&lsquo;)&rsquo;)</b>T → ( E ) ·  <i>(reduce T→(E))</i></div>
+</div>
+<p>Các cạnh dùng chung: <code>goto(I4,T)=goto(I6,T)=I2</code>; <code>goto(I4,int)=goto(I6,int)=I3</code>; <code>goto(I4,&lsquo;(&rsquo;)=goto(I6,&lsquo;(&rsquo;)=I4</code>.</p>
+<p><b>Trạng thái reduce:</b> <code>I3 (T→int·), I5 (E→T;·), I7 (E→T+E·), I9 (T→(E)·)</code>; <code>I1</code> là trạng thái <b>chấp nhận</b>. Không có trạng thái nào vừa reduce vừa shift ⇒ không xung đột shift-reduce ở các trạng thái reduce ⇒ văn phạm này xử lý được bằng bảng LR (thực tế là SLR(1), xem B6).</p>
+
+<h4>③ Bài giải mẫu 2 — Câu 2 trong bt</h4>
+<p><b>Đề:</b> <code>S → S P | P</code>, <code>P → ( S ) | ( )</code>. (a) Xây automat LR(0), chỉ ra trạng thái reduce, có xung đột không? (b) Vẽ ≥4 trạng thái LR(1).</p>
+<p><b>(a)</b> Augment <code>S'→S</code>.</p>
+<div class="itemsets">
+  <div class="iset"><b>I0</b>S' → · S
+S → · S P
+S → · P
+P → · ( S )
+P → · ( )</div>
+  <div class="iset"><b>I1 =goto(I0,S)</b>S' → S ·   <i>(accept trên $)</i>
+S → S · P
+P → · ( S )
+P → · ( )</div>
+  <div class="iset"><b>I2 =goto(I0,P)</b>S → P ·   <i>(reduce S→P)</i></div>
+  <div class="iset"><b>I3 =goto(I0,&lsquo;(&rsquo;)</b>P → ( · S )
+P → ( · )
+S → · S P
+S → · P
+P → · ( S )
+P → · ( )</div>
+  <div class="iset"><b>I4 =goto(I1,P)</b>S → S P ·  <i>(reduce S→SP)</i></div>
+  <div class="iset"><b>I5 =goto(I3,S)</b>P → ( S · )
+S → S · P
+P → · ( S )
+P → · ( )</div>
+  <div class="iset"><b>I6 =goto(I3,&lsquo;)&rsquo;)</b>P → ( ) ·  <i>(reduce P→())</i></div>
+  <div class="iset"><b>I7 =goto(I5,&lsquo;)&rsquo;)</b>P → ( S ) ·  <i>(reduce P→(S))</i></div>
+</div>
+<p>Cạnh dùng chung: <code>goto(I1,&lsquo;(&rsquo;)=goto(I3,&lsquo;(&rsquo;)=goto(I5,&lsquo;(&rsquo;)=I3</code>; <code>goto(I3,P)=I2</code>; <code>goto(I5,P)=I4</code>.</p>
+<p><b>Trạng thái reduce:</b> <code>I2 (S→P·), I4 (S→SP·), I6 (P→()·), I7 (P→(S)·)</code>. Mỗi trạng thái này chỉ chứa <b>một</b> item hoàn tất và không kèm item shift ⇒ <b>không có xung đột shift-reduce hay reduce-reduce</b> (item <code>S'→S·</code> ở <code>I1</code> là chấp nhận đặc biệt chỉ trên <code>$</code>). Vậy văn phạm này thân thiện LR. (Nếu đề coi <code>S'→S·</code> lẫn cạnh shift <code>(</code> trong I1 là “đụng” thì đó chỉ là accept-vs-shift, được phân biệt bằng <code>$</code> so với <code>(</code> — SLR(1) xử lý sạch.)</p>
+<p><b>(b) LR(1)</b> = mỗi item kèm <b>lookahead</b> <code>[A→α·β, a]</code>. Bốn trạng thái đầu:</p>
+<div class="itemsets">
+  <div class="iset"><b>I0 (LR1)</b>[S'→·S, $]
+[S→·S P, $/(]
+[S→·P, $/(]
+[P→·(S), $/(]
+[P→·(), $/(]</div>
+  <div class="iset"><b>I1 =goto(I0,S)</b>[S'→S·, $]
+[S→S·P, $/(]
+[P→·(S), $/(]
+[P→·(), $/(]</div>
+  <div class="iset"><b>I2 =goto(I0,P)</b>[S→P·, $/(]  <i>(reduce, lookahead $ hoặc &lsquo;(&rsquo;)</i></div>
+  <div class="iset"><b>I3 =goto(I0,&lsquo;(&rsquo;)</b>[P→(·S), $/(]
+[P→(·), $/(]
+[S→·S P, )/(]
+[S→·P, )/(]
+[P→·(S), )/(]
+[P→·(), )/(]</div>
+</div>
+<p>Lookahead giúp reduce chính xác (vd reduce <code>S→P</code> chỉ khi ký hiệu kế thuộc <code>{$, (}</code>). Từ đây triển khai tiếp cho đủ trạng thái sẽ ra bảng LR(1)/LALR(1).</p>
+
+<div class="note"><b>Khái niệm Handle trong bt:</b> ngăn xếp chia hai phần “đang xử lý | chưa xử lý”; handle là vế phải luật xuất hiện ở đỉnh phần đang xử lý — bộ phân tích shift cho tới khi thấy handle rồi reduce. Việc “truy vết” (trace) một chuỗi qua automat LR(0) chính là chuỗi thao tác shift/reduce.</div>
+
+<!-- ---------- B6 ---------- -->
+<h3 id="b6">B6. Bảng SLR(1)</h3>
+
+<h4>① Lý thuyết cần biết</h4>
+<p>SLR(1) = automat <b>LR(0)</b> + dùng <b>FOLLOW</b> để giới hạn khi nào reduce, nhờ đó gỡ nhiều xung đột mà LR(0) gặp.</p>
+<div class="def"><b>Quy tắc điền bảng ACTION/GOTO (SLR):</b>
+<ul style="margin:6px 0">
+  <li>Trạng thái <code>Iᵢ</code> có <code>A→α·aβ</code>, <code>goto(Iᵢ,a)=Iⱼ</code> ⇒ <code>ACTION[i,a]=shift j</code>.</li>
+  <li>Trạng thái <code>Iᵢ</code> có item hoàn tất <code>A→α·</code> (A≠S') ⇒ <code>ACTION[i,a]=reduce A→α</code> cho <b>mọi</b> <code>a∈FOLLOW(A)</code>.</li>
+  <li><code>S'→S·</code> ⇒ <code>ACTION[i,$]=accept</code>.</li>
+  <li><code>goto(Iᵢ,A)=Iⱼ</code> với A là biến ⇒ <code>GOTO[i,A]=j</code>.</li>
+</ul></div>
+
+<h4>② Các bước làm</h4>
+<ol class="steps">
+  <li>Xây automat LR(0) (như B5).</li>
+  <li>Tính FOLLOW cho mọi biến.</li>
+  <li>Điền ACTION (shift từ cạnh ký hiệu kết thúc; reduce trên FOLLOW của item hoàn tất) và GOTO.</li>
+  <li>Nếu ô ACTION có cả shift lẫn reduce (hoặc 2 reduce) ⇒ không SLR(1).</li>
+</ol>
+
+<h4>③ Bài giải mẫu</h4>
+<p>Dùng automat LR(0) của <code>S→E; E→T;|T+E; T→int|(E)</code> (mẫu 1, B5). FOLLOW: <code>FOLLOW(E)={;, ), $}</code>… (đơn giản hóa cho lược đồ này: reduce <code>E→T;</code> tại <code>I5</code>, <code>E→T+E</code> tại <code>I7</code>, <code>T→(E)</code> tại <code>I9</code>, <code>T→int</code> tại <code>I3</code> chỉ trên các ký hiệu thuộc FOLLOW tương ứng). Bảng ACTION rút gọn (s = shift, r = reduce theo luật, acc = accept):</p>
+<div class="tblwrap">
+<table>
+<tr><th>Trạng thái</th><th>int</th><th>(</th><th>)</th><th>+</th><th>;</th><th>$</th><th>GOTO E</th><th>GOTO T</th></tr>
+<tr><td class="rowh">I0</td><td>s3</td><td>s4</td><td></td><td></td><td></td><td></td><td>1</td><td>2</td></tr>
+<tr><td class="rowh">I1</td><td></td><td></td><td></td><td></td><td></td><td class="hl">acc</td><td></td><td></td></tr>
+<tr><td class="rowh">I2</td><td></td><td></td><td></td><td>s6</td><td>s5</td><td></td><td></td><td></td></tr>
+<tr><td class="rowh">I3</td><td colspan="6">reduce T→int (trên FOLLOW(T))</td><td></td><td></td></tr>
+<tr><td class="rowh">I4</td><td>s3</td><td>s4</td><td></td><td></td><td></td><td></td><td>8</td><td>2</td></tr>
+<tr><td class="rowh">I5</td><td colspan="6">reduce E→T; (trên FOLLOW(E))</td><td></td><td></td></tr>
+<tr><td class="rowh">I6</td><td>s3</td><td>s4</td><td></td><td></td><td></td><td></td><td>7</td><td>2</td></tr>
+<tr><td class="rowh">I7</td><td colspan="6">reduce E→T+E (trên FOLLOW(E))</td><td></td><td></td></tr>
+<tr><td class="rowh">I8</td><td></td><td></td><td>s9</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td class="rowh">I9</td><td colspan="6">reduce T→(E) (trên FOLLOW(T))</td><td></td><td></td></tr>
+</table>
+</div>
+<p>Không ô nào có hai hành động ⇒ văn phạm <b>là SLR(1)</b>.</p>
+
+<!-- ---------- B7 ---------- -->
+<h3 id="b7">B7. LR(1) &amp; LALR(1)</h3>
+<h4>① Lý thuyết cần biết</h4>
+<ul>
+  <li><b>LR(1) item:</b> <code>[A→α·β, a]</code> kèm <b>lookahead</b> <code>a</code>. Chỉ reduce <code>A→α</code> khi ký hiệu kế đúng bằng lookahead ⇒ chính xác hơn SLR.</li>
+  <li><b>LALR(1):</b> gộp các trạng thái LR(1) có <b>cùng phần lõi</b> (core = tập item bỏ lookahead), hợp nhất lookahead. Bảng nhỏ như LR(0)/SLR nhưng mạnh gần LR(1).</li>
+</ul>
+<h4>② Các bước làm</h4>
+<ol class="steps">
+  <li>Xây automat LR(1): closure lan truyền lookahead <code>FIRST(βa)</code> cho item sinh ra.</li>
+  <li>Điền bảng: reduce <code>[A→α·, a]</code> chỉ tại cột <code>a</code>.</li>
+  <li>LALR: tìm các trạng thái cùng core, gộp và hợp lookahead; kiểm tra có sinh xung đột reduce-reduce mới không.</li>
+</ol>
+<h4>③ Bài giải mẫu</h4>
+<p>Xem phần (b) của Bài giải mẫu 2 ở <a href="#b5">B5</a>: các trạng thái LR(1) đầu tiên của <code>S→SP|P, P→(S)|()</code> đã minh họa cách gắn lookahead. Khi hai trạng thái LR(1) trùng core (vd cùng <code>{P→(·S), P→(·)…}</code> nhưng khác lookahead <code>$/(</code> so với <code>)/(</code>) thì LALR gộp lại thành một, lookahead = hợp của hai.</p>
+
+<!-- ---------- B8 ---------- -->
+<h3 id="b8">B8. Phân cấp năng lực LL(1) &lt; LR(0) &lt; SLR(1) &lt; LALR(1) &lt; LR(1)</h3>
+<p class="src">Nguồn bt: “Bộ phân tích” — LL(1) &lt; LR(0) &lt; SLR(1) &lt; LALR(1) &lt; LR(1).</p>
+<div class="def">Ký hiệu <code>X &lt; Y</code> nghĩa: lớp văn phạm phân tích được bằng phương pháp <code>X</code> là <b>tập con thực sự</b> của lớp phân tích được bằng <code>Y</code>. Càng sang phải càng nhiều văn phạm xử lý được nhưng bảng càng phức tạp.</div>
+<div class="tblwrap">
+<table>
+<tr><th>Phương pháp</th><th>Hướng</th><th>Dùng lookahead?</th><th>Ghi chú</th></tr>
+<tr><td class="rowh">LL(1)</td><td>Top-down</td><td>1 ký hiệu, FIRST/FOLLOW</td><td>Cần khử đệ quy trái &amp; nhân tố trái</td></tr>
+<tr><td class="rowh">LR(0)</td><td>Bottom-up</td><td>Không</td><td>Reduce “mù” — dễ xung đột</td></tr>
+<tr><td class="rowh">SLR(1)</td><td>Bottom-up</td><td>FOLLOW</td><td>Reduce theo FOLLOW — gỡ nhiều xung đột</td></tr>
+<tr><td class="rowh">LALR(1)</td><td>Bottom-up</td><td>Lookahead gộp core</td><td>Nền tảng của yacc/bison</td></tr>
+<tr><td class="rowh">LR(1)</td><td>Bottom-up</td><td>Lookahead riêng từng trạng thái</td><td>Mạnh nhất, bảng lớn nhất</td></tr>
+</table>
+</div>
+<p><b>Ví dụ phân biệt:</b> văn phạm <code>E→T | T+E, T→int|(E)</code> KHÔNG LL(1) (cần khử nhân tố trái) nhưng LR-parse được. Nhiều văn phạm SLR-fail lại LALR/LR(1)-pass nhờ lookahead chính xác hơn.</p>
+
+<!-- ---------- B9 ---------- -->
+<h3 id="b9">B9. Dịch trực tiếp cú pháp (Syntax-Directed Translation)</h3>
+<p class="src">Nguồn: Chương 3 “Dịch trực tiếp cú pháp”, tài liệu “160 Syntax-Directed Translation”.</p>
+<h4>① Lý thuyết cần biết</h4>
+<div class="def"><b>Định nghĩa hướng cú pháp (SDD):</b> gắn <b>thuộc tính</b> cho ký hiệu văn phạm và <b>luật ngữ nghĩa</b> cho mỗi luật sinh.
+<ul style="margin:6px 0">
+  <li><b>Thuộc tính tổng hợp (synthesized):</b> tính từ <b>con → cha</b> (vd giá trị biểu thức).</li>
+  <li><b>Thuộc tính kế thừa (inherited):</b> truyền từ <b>cha/anh em → con</b> (vd kiểu, môi trường).</li>
+  <li><b>Lược đồ dịch (translation scheme):</b> chèn đoạn hành vi <code>{ … }</code> vào giữa vế phải, thực thi khi duyệt.</li>
+</ul></div>
+<h4>② Các bước làm</h4>
+<ol class="steps">
+  <li>Xác định thuộc tính cho mỗi biến (tổng hợp hay kế thừa).</li>
+  <li>Viết luật ngữ nghĩa cho từng luật sinh.</li>
+  <li>Duyệt cây (thường hậu thứ tự cho thuộc tính tổng hợp) để tính giá trị.</li>
+</ol>
+<h4>③ Bài giải mẫu</h4>
+<p><b>Đề:</b> Đánh giá biểu thức số học với SDD sau (thuộc tính <code>.val</code> tổng hợp):</p>
+<pre class="mono">Luật sinh            Luật ngữ nghĩa
+E → E₁ + T           E.val = E₁.val + T.val
+E → T                E.val = T.val
+T → T₁ * F           T.val = T₁.val * F.val
+T → F                T.val = F.val
+F → ( E )            F.val = E.val
+F → num              F.val = num.lexval</pre>
+<p><b>Tính <code>3 + 4 * 5</code>:</b> theo cây (phân tầng ưu tiên): <code>F(4).val=4, F(5).val=5 ⇒ T=4*5=20</code>; <code>F(3).val=3 ⇒ T=3</code>; <code>E = 3 + 20 = 23</code>. Kết quả <code class="kpi">23</code> (nhân trước cộng — đúng độ ưu tiên, nhờ văn phạm đã phân tầng ở B2).</p>
+
+<!-- ---------- CHECKLIST ---------- -->
+<h2 id="checklist">Checklist ôn thi nhanh</h2>
+<div class="tblwrap">
+<table>
+<tr><th>Khi đề yêu cầu…</th><th>Làm gì</th></tr>
+<tr><td class="rowh">Xây automat cho ngôn ngữ</td><td>Xác định “trạng thái nhớ gì” → q₀, F → vẽ đủ cạnh từng ký hiệu</td></tr>
+<tr><td class="rowh">NFA → DFA</td><td>Xây tập con (ε-closure); chấp nhận = tập chứa trạng thái chấp nhận NFA</td></tr>
+<tr><td class="rowh">NFA → RegEx</td><td>Khử trạng thái: nối tiếp→ghép, vòng→*, song song→∪</td></tr>
+<tr><td class="rowh">Chứng minh KHÔNG chính quy</td><td>Bổ đề bơm: chọn s khéo, ép y vào vùng nhạy cảm, bơm n=0 hoặc 2</td></tr>
+<tr><td class="rowh">Chứng minh nhập nhằng</td><td>Tìm 1 chuỗi có 2 cây/2 dẫn xuất trái nhất</td></tr>
+<tr><td class="rowh">Khử nhập nhằng</td><td>Phân tầng E/T/F theo ưu tiên; đệ quy trái ⇒ kết hợp trái</td></tr>
+<tr><td class="rowh">Kiểm tra LL(1)</td><td>Khử đệ quy trái + nhân tố trái; lập bảng; có ô ≥2 luật ⇒ không LL(1)</td></tr>
+<tr><td class="rowh">Xây automat LR(0)</td><td>Augment S'→S; closure/goto; đánh dấu trạng thái reduce &amp; xung đột</td></tr>
+<tr><td class="rowh">Bảng SLR(1)</td><td>LR(0) + reduce theo FOLLOW</td></tr>
+<tr><td class="rowh">LR(1)/LALR(1)</td><td>Item kèm lookahead; LALR gộp trạng thái cùng core</td></tr>
+</table>
+</div>
+
+<div class="foot">
+  <p><b>Tài liệu ôn tập — Lý thuyết Tính toán / Chương 7 (Compiler).</b> Biên soạn từ các slide Chương 7 và bộ bài tập viết tay trong thư mục <code>bt</code>. Các lời giải mẫu đã được tính lại/kiểm tra (FIRST/FOLLOW, bảng LL(1), xây tập con NFA→DFA, automat LR(0)).</p>
+  <p class="small">Để in PDF: mở file trong trình duyệt → <kbd>Cmd/Ctrl + P</kbd> → chọn <i>Save as PDF</i>. Mỗi mục lớn (Phần A/B, từng H2) tự ngắt sang trang mới.</p>
+</div>
+
+</div>
+</body>
+</html>
