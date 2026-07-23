@@ -283,6 +283,7 @@ R*:   thêm qstart/qend, cạnh ε: start→R, R→start (lặp), start→end (r
 </table>
 </div>
 <p><b>Chạy <code>1110</code>:</b> <code>{q₀} →<sup>1</sup> {q₀,q₁} →<sup>1</sup> {q₀,q₁,q₂} →<sup>1</sup> {q₀,q₁,q₂,q₃} →<sup>0</sup> {q₀,q₃}</code>. Kết thúc ở <code>{q₀,q₃}</code> có chứa <code>q₃</code> → <b>chấp nhận</b> ✓ (đúng vì <code>1110</code> chứa <code>111</code>).</p>
+<div class="note"><b>Lưu ý về ε-closure:</b> NFA ví dụ này <b>không có cạnh ε</b> nên mọi ε-closure đều tầm thường (<code>ε-closure(T)=T</code>) và bảng trên bỏ qua được bước này. <b>Nếu NFA có cạnh ε</b> (vd NFA sinh ra từ Thompson ở A3.1), phải áp <b>ε-closure ở cả hai chỗ</b>: (i) trạng thái bắt đầu là <code>ε-closure({q₀})</code>, và (ii) mỗi ô <code>δ(T,a)</code> phải lấy <code>ε-closure(⋃<sub>q∈T</sub> δ(q,a))</code> — tức sau khi đi theo cạnh <code>a</code> còn phải “đi thêm mọi cạnh ε miễn phí” trước khi ghi vào bảng. Bỏ sót bước này là lỗi phổ biến nhất khi chuyển ε-NFA → DFA.</div>
 
 <h4>A3.3 — NFA → RegEx (khử trạng thái / GNFA)</h4>
 <ol class="steps">
@@ -319,7 +320,7 @@ R*:   thêm qstart/qend, cạnh ε: start→R, R→start (lặp), start→end (r
 <p><b>Đề:</b> Chứng minh <code>L = {aⁿbⁿ | n ≥ 0}</code> không chính quy.</p>
 <p><b>Giải.</b> Giả sử L chính quy, có hằng số bơm <code>p</code>. Chọn <code class="kpi">s = a<sup>p</sup>b<sup>p</sup> ∈ L</code>, <code>|s| = 2p ≥ p</code>. Theo bổ đề, <code>s = xyz</code> với <code>|y|≥1</code> và <code>|xy|≤p</code>. Vì <code>p</code> ký hiệu đầu của <code>s</code> đều là <code>a</code> nên <code>|xy|≤p</code> ⇒ <code>x,y</code> chỉ gồm <code>a</code>, tức <code>y = a<sup>k</sup></code> với <code>k = |y| ≥ 1</code>.</p>
 <p>Bơm <code>n=2</code>: <code>xy²z = a<sup>p+k</sup>b<sup>p</sup></code>. Vì <code>k≥1</code> nên số <code>a</code> (<code>p+k</code>) khác số <code>b</code> (<code>p</code>) ⇒ <code>xy²z ∉ L</code>. Mâu thuẫn với điều kiện 3 ⇒ <b>L không chính quy.</b> ∎</p>
-<div class="note"><b>Biến thể trong bt — <code>L = {w | |w| = 2ⁿ, n≥0}</code>:</b> chọn <code>s∈L</code> với <code>|s| = 2<sup>p</sup> ≥ p</code>. Với mọi cách tách, <code>1 ≤ |y| ≤ |xy| ≤ p</code>. Bơm <code>n=2</code>: <code>|xy²z| = 2<sup>p</sup> + |y|</code>, mà <code>2<sup>p</sup> &lt; 2<sup>p</sup>+|y| ≤ 2<sup>p</sup>+p &lt; 2<sup>p</sup>+2<sup>p</sup> = 2<sup>p+1</sup></code>. Vậy độ dài nằm <b>giữa hai lũy thừa 2 liên tiếp</b> nên không thể là <code>2ⁿ</code> ⇒ <code>xy²z ∉ L</code> ⇒ mâu thuẫn.</div>
+<div class="note"><b>Biến thể trong bt — <code>L = {w | |w| = 2ⁿ, n≥0}</code>:</b> chọn <code>s∈L</code> với <code>|s| = 2<sup>p</sup> ≥ p</code>. Với mọi cách tách, <code>1 ≤ |y| ≤ |xy| ≤ p</code>. Bơm <code>n=2</code>: <code>|xy²z| = 2<sup>p</sup> + |y|</code>. Do <code>|y| ≤ p</code> và <b><code>p &lt; 2<sup>p</sup></code></b> (đúng với mọi <code>p ≥ 1</code>) nên <code>2<sup>p</sup> &lt; 2<sup>p</sup>+|y| ≤ 2<sup>p</sup>+p &lt; 2<sup>p</sup>+2<sup>p</sup> = 2<sup>p+1</sup></code> — cả hai dấu nghiêm ngặt. Vậy độ dài nằm <b>hẳn giữa hai lũy thừa 2 liên tiếp</b> nên không thể là <code>2ⁿ</code> ⇒ <code>xy²z ∉ L</code> ⇒ mâu thuẫn.</div>
 
 <!-- =================================================================== -->
 <!-- PHẦN B -->
@@ -543,7 +544,8 @@ T → · ( E )</div>
   <div class="iset"><b>I9 =goto(I8,&lsquo;)&rsquo;)</b>T → ( E ) ·  <i>(reduce T→(E))</i></div>
 </div>
 <p>Các cạnh dùng chung: <code>goto(I4,T)=goto(I6,T)=I2</code>; <code>goto(I4,int)=goto(I6,int)=I3</code>; <code>goto(I4,&lsquo;(&rsquo;)=goto(I6,&lsquo;(&rsquo;)=I4</code>.</p>
-<p><b>Trạng thái reduce:</b> <code>I3 (T→int·), I5 (E→T;·), I7 (E→T+E·), I9 (T→(E)·)</code>; <code>I1</code> là trạng thái <b>chấp nhận</b>. Không có trạng thái nào vừa reduce vừa shift ⇒ không xung đột shift-reduce ở các trạng thái reduce ⇒ văn phạm này xử lý được bằng bảng LR (thực tế là SLR(1), xem B6).</p>
+<p><b>Trạng thái reduce:</b> <code>I3 (T→int·), I5 (E→T;·), I7 (E→T+E·), I9 (T→(E)·)</code>; <code>I1</code> là trạng thái <b>chấp nhận</b>. Bốn trạng thái reduce mỗi cái chỉ chứa <b>một</b> item hoàn tất và <b>không</b> kèm cạnh shift; riêng <code>I1 = {S→E·}</code> cũng chỉ có mình item chấp nhận, <b>không</b> có cạnh shift nào ra khỏi nó. Vậy không trạng thái nào vừa reduce/accept vừa shift ⇒ <b>đây là văn phạm LR(0) thật sự</b> (không cần lookahead).</p>
+<div class="tip"><b>So sánh với Đề 2 Câu 2:</b> ở đó văn phạm <code>E→E+T|T</code> <b>đệ quy trái</b> nên trạng thái chứa <code>S'→E·</code> <b>đồng thời</b> có cạnh shift <code>+</code> (từ <code>E→E·+T</code>) ⇒ <b>không</b> LR(0), phải lên SLR(1). Còn ở mẫu 1 này, do <code>E</code> chỉ xuất hiện ở cuối vế phải (<code>S→E</code>, <code>T→(E)</code>, <code>E→T+E</code>) nên trạng thái sau khi đọc <code>E</code> không còn ký hiệu nào để shift — đó là lý do nó là LR(0) thuần, còn Đề 2 thì không.</div>
 
 <h4>③ Bài giải mẫu 2 — Câu 2 trong bt</h4>
 <p><b>Đề:</b> <code>S → S P | P</code>, <code>P → ( S ) | ( )</code>. (a) Xây automat LR(0), chỉ ra trạng thái reduce, có xung đột không? (b) Vẽ ≥4 trạng thái LR(1).</p>
@@ -658,6 +660,13 @@ P → · ( )</div>
 <h3 id="b8">B8. Phân cấp năng lực LL(1) &lt; LR(0) &lt; SLR(1) &lt; LALR(1) &lt; LR(1)</h3>
 <p class="src">Nguồn bt: “Bộ phân tích” — LL(1) &lt; LR(0) &lt; SLR(1) &lt; LALR(1) &lt; LR(1).</p>
 <div class="def">Ký hiệu <code>X &lt; Y</code> nghĩa: lớp văn phạm phân tích được bằng phương pháp <code>X</code> là <b>tập con thực sự</b> của lớp phân tích được bằng <code>Y</code>. Càng sang phải càng nhiều văn phạm xử lý được nhưng bảng càng phức tạp.</div>
+<div class="warn"><b>⚠️ Chính xác về mặt lý thuyết (dễ bị hỏi bẫy):</b> Chuỗi <code>LL(1) &lt; LR(0) &lt; SLR(1) &lt; LALR(1) &lt; LR(1)</code> mà nhiều giáo trình VN ghi <b>chỉ đúng cho nhánh bottom-up</b>: thật sự
+<code>LR(0) ⊂ SLR(1) ⊂ LALR(1) ⊂ LR(1)</code>. Còn <b><code>LL(1)</code> và <code>LR(0)</code> KHÔNG so sánh được</b> (incomparable) — không lớp nào chứa lớp kia:
+<ul style="margin:6px 0">
+  <li><code>S→aS | a</code> là <b>LR(0)</b> nhưng <b>không LL(1)</b> (không nhân tố trái được để quyết định bằng 1 lookahead).</li>
+  <li>Ngược lại, chính văn phạm <code>E→TY, Y→+E | ε</code> ở mục B4 là <b>LL(1)</b> nhưng <b>không LR(0)</b>: có non-terminal nullable (<code>Y</code>) gây trạng thái vừa shift vừa reduce. Đây cũng là mâu thuẫn nếu ta tin “LL(1) ⊂ LR(0)”.</li>
+</ul>
+Điều đúng tổng quát là <b><code>LL(k) ⊂ LR(k)</code></b> (mọi văn phạm LL(k) đều LR(k)), và <code>LL(1) ⊂ LR(1)</code>. Khi đi thi: nếu đề yêu cầu “sắp xếp theo giáo trình” cứ ghi chuỗi trên, <b>nhưng nên kèm câu</b>: “LL(1) và LR(0) thực chất không so sánh được; quan hệ bao hàm đúng là LL(k) ⊂ LR(k).”</div>
 <div class="tblwrap">
 <table>
 <tr><th>Phương pháp</th><th>Hướng</th><th>Dùng lookahead?</th><th>Ghi chú</th></tr>
@@ -865,7 +874,7 @@ F  → ( E ) | id</pre>
 <p><b>a)</b> Sắp xếp LL(1), LR(0), SLR(1), LALR(1), LR(1) theo năng lực tăng dần.
 <b>b)</b> Giải thích vì sao văn phạm <code>E→E+T|T, T→id|(E)</code> (Đề 2) là SLR(1) nhưng không LR(0).</p>
 <div class="sol">
-<p><b>a)</b> <code class="kpi">LL(1) &lt; LR(0) &lt; SLR(1) &lt; LALR(1) &lt; LR(1)</code> — càng phải càng phân tích được nhiều văn phạm (bảng càng lớn).</p>
+<p><b>a)</b> Theo giáo trình: <code class="kpi">LL(1) &lt; LR(0) &lt; SLR(1) &lt; LALR(1) &lt; LR(1)</code> — càng phải càng phân tích được nhiều văn phạm (bảng càng lớn). <b>Lưu ý (ghi thêm để lấy trọn điểm):</b> quan hệ bao hàm thực sự chỉ chặt ở nhánh bottom-up <code>LR(0) ⊂ SLR(1) ⊂ LALR(1) ⊂ LR(1)</code>; riêng <b>LL(1) và LR(0) không so sánh được</b> (xem cảnh báo ở mục B8), đúng nhất là <code>LL(k) ⊂ LR(k)</code>.</p>
 <p><b>b)</b> LR(0) reduce “mù” (không nhìn lookahead): tại trạng thái <code>I1</code> vừa có item hoàn tất <code>S'→E·</code> vừa có cạnh shift <code>+</code> ⇒ xung đột shift-reduce. SLR(1) chỉ reduce khi ký hiệu kế thuộc <code>FOLLOW</code> (và accept chỉ trên <code>$</code>) nên tách được hai hành động ⇒ hết xung đột.</p>
 </div>
 
@@ -935,16 +944,19 @@ Cây:     S
 
 <h4>c) Áp dụng kỹ thuật phân tầng để khử nhập nhằng</h4>
 <p><b>Ý tưởng.</b> Loại bỏ tự do của <code>SS</code> bằng cách ép <b>một cách tách duy nhất</b>: đọc ký hiệu đầu tiên, nó quyết định “khối” mở đầu; phần còn lại nối tiếp một cách xác định. Cụ thể mỗi chuỗi khác rỗng được tách thành <b>3 phần</b> (đúng như gợi ý của đề):</p>
+<p><b>Công cụ để nói chính xác — “độ cao tiền tố”.</b> Gán <code>a = +1</code>, <code>b = −1</code>; với chuỗi <code>w</code> đặt <code>h(i)</code> = tổng dấu của <code>i</code> ký hiệu đầu (<code>h(0)=0</code>). Chuỗi thuộc <code>L</code> ⇔ <code>h(|w|)=0</code>. Với <code>w</code> mở đầu bằng <code>a</code> (nên <code>h(1)=1</code>), gọi <code>m</code> = <b>vị trí đầu tiên sau đó mà <code>h(m)=0</code></b> (lần đầu độ cao trở về 0). Vì <code>h</code> đổi 1 đơn vị mỗi bước, ký hiệu tại vị trí <code>m</code> chắc chắn là <code>b</code>, và trên đoạn giữa độ cao luôn <code>≥ 1</code>.</p>
 <pre class="mono">nếu bắt đầu bằng a:  w = a · X · b · Y
 nếu bắt đầu bằng b:  w = b · X · a · Y
-   trong đó X là khối cân bằng bên trong (bị ký hiệu đối xứng đóng lại
-   ở vị trí tái cân bằng đầu tiên), Y là phần còn lại.</pre>
+   • b (hoặc a) đóng khối = ký hiệu ở vị trí ĐẦU TIÊN mà độ cao tiền tố
+     trở lại 0 (first-return). Vị trí này là DUY NHẤT.
+   • X = đoạn giữa (tự nó cân bằng, độ cao luôn ≥1 nên ∈ L),
+     Y = phần đuôi còn lại (cũng ∈ L).</pre>
 <p><b>Văn phạm sau khi phân tầng (không nhập nhằng):</b></p>
 <pre class="mono">S → a S b S
   | b S a S
   | ε</pre>
-<div class="def"><b>Vì sao hết nhập nhằng:</b> với chuỗi khác rỗng, ký hiệu đầu tiên là <code>a</code> hoặc <code>b</code> → chọn được đúng một luật. Vị trí ký hiệu đối xứng (<code>b</code> hoặc <code>a</code>) đóng khối được xác định <b>duy nhất</b> tại điểm tiền tố tái cân bằng số <code>a</code>/<code>b</code> lần đầu; do đó <code>S</code> đầu (khối trong) và <code>S</code> sau (phần còn) đều được xác định duy nhất ⇒ mỗi chuỗi có đúng một cây. Đây là văn phạm chuẩn cho ngôn ngữ “số <code>a</code> bằng số <code>b</code>”.</div>
-<p><b>Kiểm chứng với <code>aabb</code> (tách 3 phần):</b> ký hiệu đầu <code>a</code> ⇒ dùng <code>S→aSbS</code>. Tái cân bằng đầu tiên sau <code>a</code>: tiền tố <code>a a b</code> chưa cân bằng, <code>a a b b</code> cân bằng ⇒ ký hiệu <code>b</code> đóng khối là <code>b</code> cuối; khối trong <code>X=ab</code>, phần còn <code>Y=ε</code>.</p>
+<div class="def"><b>Vì sao hết nhập nhằng (lập luận chặt):</b> với chuỗi khác rỗng, ký hiệu đầu (<code>a</code> hay <code>b</code>) quyết định <b>duy nhất</b> luật dùng. Ký hiệu đối xứng đóng khối được ép về <b>vị trí first-return</b> <code>m</code> ở trên — vị trí này tồn tại và duy nhất (giá trị nhỏ nhất của tập <code>{i&gt;1 : h(i)=0}</code>). Khi đã cố định <code>m</code>: khối trong <code>X = w[2..m−1]</code> và đuôi <code>Y = w[m+1..]</code> cũng được xác định duy nhất, rồi đệ quy. Vậy mỗi chuỗi có <b>đúng một cây</b>. Đây chính là “first-return decomposition” của đường Dyck tổng quát — văn phạm chuẩn, không nhập nhằng, cho ngôn ngữ “số <code>a</code> bằng số <code>b</code>”.</div>
+<p><b>Kiểm chứng với <code>aabb</code>:</b> mở đầu <code>a</code> ⇒ luật <code>S→aSbS</code>. Độ cao tiền tố: <code>h=0,1,2,1,0</code> tại các mốc <code>ε,a,aa,aab,aabb</code>. Lần <b>đầu tiên</b> <code>h</code> về 0 sau vị trí 1 là ở vị trí 4 (ký tự <code>b</code> cuối) ⇒ đó là <code>b</code> đóng khối; khối trong <code>X = w[2..3] = ab</code>, đuôi <code>Y = ε</code>.</p>
 <pre class="mono">S ⇒ a S b S
   ⇒ a (aSbS) b S      [khối trong X: bắt đầu a]
   ⇒ a (a·ε·b·ε) b ε   [X = ab ; Y = ε]
@@ -1228,7 +1240,7 @@ U → if E then S
 <p>Chứng minh <code>L = { a<sup>n²</sup> | n ≥ 0 } = {ε, a, aaaa, a⁹, a¹⁶, …}</code> không chính quy.</p>
 <div class="sol">
 <ol class="steps">
-  <li>Giả sử chính quy ⇒ có <code>p</code>. Chọn <code>s = a<sup>p²</sup> ∈ L</code>, <code>|s| = p² ≥ p</code>.</li>
+  <li>Giả sử chính quy ⇒ có hằng số bơm <code>p ≥ 1</code>. Chọn <code>s = a<sup>p²</sup> ∈ L</code>, <code>|s| = p² ≥ p</code> (đúng vì <code>p ≥ 1</code>).</li>
   <li><code>s = xyz</code>, <code>1 ≤ |y| ≤ |xy| ≤ p</code>. Đặt <code>k = |y|</code>, vậy <code>1 ≤ k ≤ p</code>.</li>
   <li>Bơm <code>i=2</code>: <code>|xy²z| = p² + k</code>.</li>
   <li>Ước lượng: <code>p² &lt; p² + k ≤ p² + p &lt; p² + 2p + 1 = (p+1)²</code>.</li>
@@ -1362,11 +1374,11 @@ F → ( E ) | id</pre>
 <p>Chứng minh <code>L = { a<sup>2ⁿ</sup> | n ≥ 0 } = {a, aa, aaaa, a⁸, …}</code> không chính quy <span class="small">(dạng “bộ đề bơm” trong bt)</span>.</p>
 <div class="sol">
 <ol class="steps">
-  <li>Giả sử chính quy ⇒ có <code>p</code>. Chọn <code>n</code> đủ lớn để <code>2ⁿ ≥ p</code>, lấy <code>s = a<sup>2ⁿ</sup> ∈ L</code>.</li>
-  <li><code>s=xyz</code>, <code>1 ≤ |y| ≤ |xy| ≤ p ≤ 2ⁿ</code>. Đặt <code>k=|y|</code>, <code>1≤k≤2ⁿ</code>.</li>
+  <li>Giả sử chính quy ⇒ có <code>p</code>. Chọn <code>n</code> đủ lớn để <code class="kpi">2ⁿ &gt; p</code> (<b>nghiêm ngặt</b>, không chỉ <code>≥</code> — đây là chỗ hay sai), lấy <code>s = a<sup>2ⁿ</sup> ∈ L</code>, <code>|s|=2ⁿ ≥ p</code>.</li>
+  <li><code>s=xyz</code>, <code>1 ≤ |y| ≤ |xy| ≤ p</code>. Đặt <code>k=|y|</code>. Vì <code>2ⁿ &gt; p ≥ k</code> nên <code class="kpi">1 ≤ k ≤ p &lt; 2ⁿ</code>.</li>
   <li>Bơm <code>i=2</code>: <code>|xy²z| = 2ⁿ + k</code>.</li>
-  <li>Chặn: <code>2ⁿ &lt; 2ⁿ + k ≤ 2ⁿ + 2ⁿ = 2<sup>n+1</sup></code>.</li>
-  <li>Vậy <code>2ⁿ &lt; |xy²z| &lt; 2<sup>n+1</sup></code> — độ dài nằm <b>giữa hai luỹ thừa 2 liên tiếp</b> ⇒ không là luỹ thừa của 2 ⇒ <code>xy²z ∉ L</code>. Mâu thuẫn.</li>
+  <li>Chặn: do <code>k &lt; 2ⁿ</code> nên <code>2ⁿ &lt; 2ⁿ + k &lt; 2ⁿ + 2ⁿ = 2<sup>n+1</sup></code> (<b>cả hai dấu đều nghiêm ngặt</b> — nếu chỉ có <code>k ≤ 2ⁿ</code> thì khi <code>k=2ⁿ</code> sẽ ra đúng <code>2<sup>n+1</sup> ∈ L</code>, hỏng chứng minh).</li>
+  <li>Vậy <code>2ⁿ &lt; |xy²z| &lt; 2<sup>n+1</sup></code> — độ dài nằm <b>hẳn giữa hai luỹ thừa 2 liên tiếp</b> ⇒ không là luỹ thừa của 2 ⇒ <code>xy²z ∉ L</code>. Mâu thuẫn.</li>
 </ol>
 <p>⇒ <b><code>L</code> không chính quy.</b> ∎</p>
 </div>
