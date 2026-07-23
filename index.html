@@ -80,6 +80,9 @@
   .sol{border-left:3px solid var(--accent2); background:#f3faf6; border-radius:0 8px 8px 0; padding:8px 16px; margin:8px 0}
   .sol::before{content:"✎ Lời giải"; display:block; font-weight:700; color:var(--accent2); font-size:.85rem; margin-bottom:4px}
   .exam .duration{font-size:.82rem; color:var(--muted); margin:2px 0 0}
+  .why{background:#fbf3ff; border:1px solid #e4cdf5; border-left:4px solid #9b51e0; border-radius:8px; padding:10px 16px; margin:10px 0; font-size:.95rem}
+  .why::before{content:"❓ Vì sao?"; display:block; font-weight:700; color:#7d3ac1; font-size:.85rem; margin-bottom:3px}
+  .structure{background:var(--card); border:1px dashed var(--accent); border-radius:8px; padding:10px 16px; margin:14px 0; font-size:.92rem}
   @media print{
     body{font-size:11.5pt}
     .wrap{max-width:none; padding:0 8mm}
@@ -139,6 +142,15 @@
         <li><a href="#tl-cau2">Câu 2 — Automat LR(0)/LR(1): S → SP | P, P → (S) | ( )</a></li>
       </ol>
     </li>
+    <li><a href="#bo5de"><b>BỘ 5 ĐỀ TỰ LUẬN THEO CẤU TRÚC ĐỀ THI</b> (DFA · bơm · khử mơ hồ · LR(1))</a>
+      <ol>
+        <li><a href="#bde1">Đề 1 — giải thích kiểu giáo trình (tại sao)</a></li>
+        <li><a href="#bde2">Đề 2 — giải thích kiểu giáo trình (tại sao)</a></li>
+        <li><a href="#bde3">Đề 3</a></li>
+        <li><a href="#bde4">Đề 4</a></li>
+        <li><a href="#bde5">Đề 5</a></li>
+      </ol>
+    </li>
     <li><a href="#checklist">Checklist ôn thi nhanh</a></li>
   </ol>
 </nav>
@@ -156,7 +168,7 @@
    │  ┌─────────────────────┐
    └─▶│ Dịch trực tiếp CP   │  (SDT)      — thuộc tính + hành vi  → mã trung gian
       └─────────────────────┘</pre>
-<div class="note"><b>Mối liên hệ cốt lõi:</b> RegEx ⇔ NFA ⇔ DFA cùng nhận diện lớp <i>ngôn ngữ chính quy</i> (dùng cho từ vựng). Văn phạm phi ngữ cảnh (CFG) mạnh hơn, nhận diện <i>ngôn ngữ phi ngữ cảnh</i> (dùng cho cú pháp). Bổ đề bơm là công cụ chứng minh một ngôn ngữ <b>vượt khỏi</b> lớp chính quy.</p>
+<div class="note"><b>Mối liên hệ cốt lõi:</b> RegEx ⇔ NFA ⇔ DFA cùng nhận diện lớp <i>ngôn ngữ chính quy</i> (dùng cho từ vựng). Văn phạm phi ngữ cảnh (CFG) mạnh hơn, nhận diện <i>ngôn ngữ phi ngữ cảnh</i> (dùng cho cú pháp). Bổ đề bơm là công cụ chứng minh một ngôn ngữ <b>vượt khỏi</b> lớp chính quy.</div>
 
 <!-- =================================================================== -->
 <!-- PHẦN A -->
@@ -1014,6 +1026,383 @@ P → · ( )</div>
 [P →·( ),   ) , ( ]</div>
 </div>
 <p><b>Giải thích lookahead:</b> ở <code>I2</code>, reduce <code>S→P</code> chỉ hợp lệ khi ký hiệu kế thuộc <code>{$, (}</code> (đúng là <code>FOLLOW</code> tại ngữ cảnh này). Ở <code>I3</code>, các item nội bộ có lookahead <code>)</code> vì sau <code>S</code> trong <code>P→(S·)</code> sẽ là <code>)</code>. Nhờ lookahead riêng từng trạng thái, LR(1) reduce chính xác hơn LR(0)/SLR(1). Nếu sau này hai trạng thái LR(1) trùng <b>lõi</b> (core) mà chỉ khác lookahead thì gộp lại được thành trạng thái <b>LALR(1)</b>.</p>
+
+<!-- =================================================================== -->
+<!-- BỘ 5 ĐỀ TỰ LUẬN THEO CẤU TRÚC ĐỀ THI -->
+<!-- =================================================================== -->
+<h2 id="bo5de">BỘ 5 ĐỀ TỰ LUẬN THEO CẤU TRÚC ĐỀ THI</h2>
+<div class="structure">
+<b>Cấu trúc đề thi (theo ghi chú <code>bt/de1.jpg</code> — đề khoá trước):</b>
+<ol style="margin:6px 0 0">
+  <li><b>Câu 1 — Vẽ DFA</b> cho một ngôn ngữ.</li>
+  <li><b>Câu 2 — Chứng minh L không chính quy</b> (bổ đề bơm).</li>
+  <li><b>Câu 3 — Khử mơ hồ</b> (nhập nhằng) cho một văn phạm.</li>
+  <li><b>Câu 4 — LR(1)</b>: xây item/automat LR(1).</li>
+</ol>
+</div>
+<p class="lead">Năm đề dưới đây theo đúng bốn dạng trên. <b>Đề 1 &amp; Đề 2</b> được giải thích kiểu giáo trình — mỗi bước có hộp <span style="color:#7d3ac1;font-weight:700">❓ Vì sao?</span> nêu <i>tại sao</i> làm vậy và <i>tại sao</i> đúng.</p>
+
+<!-- ============================ ĐỀ 1 ============================ -->
+<h3 id="bde1">Đề 1 <span class="badge">giải thích kiểu giáo trình</span></h3>
+<div class="exam">
+<p class="duration">Thời lượng gợi ý: 75 phút · Thang điểm 10.</p>
+
+<h4 class="q"><span class="pts">2.5 điểm</span>Câu 1. Vẽ DFA</h4>
+<p>Xây DFA trên <code>Σ={0,1}</code> nhận diện <code>L = { w | số ký hiệu 1 trong w chia hết cho 3 }</code>.</p>
+<div class="sol">
+<p><b>Ý tưởng:</b> trạng thái chỉ cần “nhớ” <b>số 1 đã đọc theo mod 3</b>. Có 3 lớp dư: 0, 1, 2 ⇒ 3 trạng thái <code>q₀, q₁, q₂</code>. Ký hiệu <code>0</code> không đổi số 1 (tự lặp); ký hiệu <code>1</code> tăng dư thêm 1 (mod 3).</p>
+<pre class="mono">          1          1          1
+      ┌───────▶  ┌───────▶  ┌───────▶ (quay lại q0)
+ →((q0))       (q1)       (q2)
+   0↺           0↺         0↺
+q0 = dư 0 (bắt đầu + chấp nhận),  q1 = dư 1,  q2 = dư 2,  F={q0}</pre>
+<div class="tblwrap"><table>
+<tr><th>δ</th><th>0</th><th>1</th></tr>
+<tr><td class="rowh">→ *q0</td><td>q0</td><td>q1</td></tr>
+<tr><td class="rowh">q1</td><td>q1</td><td>q2</td></tr>
+<tr><td class="rowh">q2</td><td>q2</td><td>q0</td></tr>
+</table></div>
+<div class="why">Vì sao chỉ cần 3 trạng thái? Vì để quyết định “số 1 ⋮ 3”, thông tin <b>duy nhất</b> cần giữ là số 1 đã đọc <b>mod 3</b> — hai chuỗi có cùng số dư thì mọi phần đuôi thêm vào sẽ cho cùng kết luận (đây chính là quan hệ tương đương Myhill–Nerode). Số 1 thật sự (5, 8, 11…) là <b>thừa</b> để nhớ; chỉ cần lớp dư. Ba lớp dư ⇒ ba trạng thái, và đó cũng là <b>số trạng thái tối thiểu</b>. Chuỗi rỗng có 0 số 1 (⋮3) nên <code>q0</code> vừa là trạng thái đầu vừa chấp nhận.</div>
+</div>
+
+<h4 class="q"><span class="pts">3 điểm</span>Câu 2. Chứng minh L không chính quy</h4>
+<p>Chứng minh <code>L = {aⁿbⁿ | n ≥ 0}</code> không chính quy.</p>
+<div class="sol">
+<p><b>Chứng minh (phản chứng bằng bổ đề bơm).</b></p>
+<ol class="steps">
+  <li>Giả sử <code>L</code> chính quy. Theo bổ đề bơm, tồn tại hằng số bơm <code>p&gt;0</code>.</li>
+  <li>Chọn chuỗi <code>s = a<sup>p</sup>b<sup>p</sup> ∈ L</code>, có <code>|s| = 2p ≥ p</code>.</li>
+  <li>Bổ đề cho: <code>s = xyz</code> với <b>(i)</b> <code>|y| ≥ 1</code>, <b>(ii)</b> <code>|xy| ≤ p</code>, <b>(iii)</b> <code>xyⁱz ∈ L ∀ i ≥ 0</code>.</li>
+  <li>Do <code>|xy| ≤ p</code> và <code>p</code> ký hiệu đầu của <code>s</code> đều là <code>a</code> ⇒ <code>x, y</code> nằm trọn trong khối <code>a</code> ⇒ <code>y = a<sup>k</sup></code> với <code>k = |y| ≥ 1</code>.</li>
+  <li>Bơm <code>i = 2</code>: <code>xy²z = a<sup>p+k</sup>b<sup>p</sup></code>. Vì <code>k ≥ 1</code> nên số <code>a</code> (<code>p+k</code>) ≠ số <code>b</code> (<code>p</code>) ⇒ <code>xy²z ∉ L</code>, mâu thuẫn (iii).</li>
+</ol>
+<p>Vậy điều giả sử sai ⇒ <b><code>L</code> không chính quy.</b> ∎</p>
+<div class="why">Vì sao bổ đề bơm chứng minh được điều này? Một DFA có <b>hữu hạn</b> trạng thái (giả sử <code>p</code> trạng thái). Khi đọc chuỗi dài <code>≥ p</code>, theo <b>nguyên lý chuồng bồ câu</b> máy phải <b>lặp lại một trạng thái</b> ⇒ tồn tại một “vòng” trên đường đi. Đoạn <code>y</code> chính là nhãn của vòng đó; đi vòng thêm/bớt (bơm <code>yⁱ</code>) vẫn cho chuỗi được chấp nhận. Nếu ngôn ngữ đòi “đếm và so khớp” (số <code>a</code> = số <code>b</code>) thì việc lặp vòng chỉ ở khối <code>a</code> sẽ phá vỡ cân bằng ⇒ máy hữu hạn <b>không đủ bộ nhớ</b> để đếm không giới hạn.</div>
+<div class="why">Vì sao phải chọn <code>s = a<sup>p</sup>b<sup>p</sup></code> (mà không phải chuỗi khác)? Vì ta cần điều kiện <b>(ii) <code>|xy| ≤ p</code></b> <b>ép</b> <code>y</code> rơi hẳn vào vùng “nhạy cảm” (khối <code>a</code>). Nếu chọn chuỗi vô ý (vd để <code>y</code> có thể vắt qua cả <code>a</code> lẫn <code>b</code>) thì đối phương “bơm” có thể giữ chuỗi trong <code>L</code> và ta không mâu thuẫn được. Đặt đúng <code>p</code> ký hiệu <code>a</code> lên đầu là để tận dụng <code>|xy| ≤ p</code>.</div>
+<div class="why">Vì sao chỉ cần <b>một</b> giá trị <code>i</code> làm sai là đủ? Điều kiện (iii) khẳng định <b>mọi</b> <code>i</code> đều thuộc L. Chỉ cần chỉ ra <b>một</b> phản ví dụ (ở đây <code>i=2</code>; <code>i=0</code> cũng được) là bác bỏ được mệnh đề “với mọi”.</div>
+</div>
+
+<h4 class="q"><span class="pts">2.5 điểm</span>Câu 3. Khử mơ hồ</h4>
+<p>Cho <code>E → E + E | E * E | ( E ) | id</code>. Chứng minh nhập nhằng và khử.</p>
+<div class="sol">
+<p><b>Nhập nhằng:</b> chuỗi <code>id + id * id</code> có 2 cây (nhân trước / cộng trước) — xem <a href="#de2">Đề mẫu 2</a>. ⇒ nhập nhằng.</p>
+<p><b>Khử bằng phân tầng</b> (nhân ưu tiên hơn cộng; cả hai kết hợp trái):</p>
+<pre class="mono">E → E + T | T          (tầng cộng — ngoài cùng, ưu tiên thấp)
+T → T * F | F          (tầng nhân — trong hơn, ưu tiên cao)
+F → ( E ) | id         (hạng tử/ngoặc — trong cùng)</pre>
+<div class="why">Vì sao phân tầng lại áp được độ ưu tiên? Trong cây phân tích, ký hiệu ở <b>gần lá hơn</b> (tầng trong) được <b>gộp trước</b>. Đặt <code>*</code> ở tầng <code>T</code> (dưới <code>+</code>) nên mọi phép <code>*</code> luôn nằm trong một hạng tử <code>T</code> và bị gộp trước phép <code>+</code> ở tầng <code>E</code> ⇒ <code>*</code> ưu tiên cao hơn <code>+</code>.</div>
+<div class="why">Vì sao <b>đệ quy trái</b> cho kết hợp trái? Với <code>E → E + T</code>, phần lặp lại (<code>E</code>) nằm bên <b>trái</b> nên cây “nghiêng trái”: <code>a+b+c</code> được đọc là <code>(a+b)+c</code>. Nếu viết <code>E → T + E</code> (đệ quy phải) sẽ thành <code>a+(b+c)</code> — kết hợp phải. Chọn hướng đệ quy = chọn tính kết hợp.</div>
+</div>
+
+<h4 class="q"><span class="pts">2 điểm</span>Câu 4. LR(1)</h4>
+<p>Cho <code>S → C C</code>, <code>C → c C | d</code>. Xây các item LR(1).</p>
+<div class="sol">
+<p>Augment <code>S'→S</code>. Đánh số: 1:S→CC, 2:C→cC, 3:C→d.</p>
+<div class="itemsets">
+  <div class="iset"><b>I0</b>[S'→·S, $]
+[S →·C C, $]
+[C →·c C, c/d]
+[C →·d,   c/d]</div>
+  <div class="iset"><b>I1=goto(I0,S)</b>[S'→S·, $]  <i>(accept)</i></div>
+  <div class="iset"><b>I2=goto(I0,C)</b>[S →C·C, $]
+[C →·c C, $]
+[C →·d,   $]</div>
+  <div class="iset"><b>I3=goto(I0,c)</b>[C →c·C, c/d]
+[C →·c C, c/d]
+[C →·d,   c/d]</div>
+  <div class="iset"><b>I4=goto(I0,d)</b>[C →d·, c/d]  <i>(reduce 3)</i></div>
+  <div class="iset"><b>I5=goto(I2,C)</b>[S →C C·, $]  <i>(reduce 1)</i></div>
+  <div class="iset"><b>I6=goto(I2,c)</b>[C →c·C, $]
+[C →·c C, $]
+[C →·d,   $]</div>
+  <div class="iset"><b>I7=goto(I2,d)</b>[C →d·, $]  <i>(reduce 3)</i></div>
+  <div class="iset"><b>I8=goto(I3,C)</b>[C →c C·, c/d]  <i>(reduce 2)</i></div>
+  <div class="iset"><b>I9=goto(I6,C)</b>[C →c C·, $]  <i>(reduce 2)</i></div>
+</div>
+<p>Chuyển: <code>goto(I3,c)=I3, goto(I3,d)=I4</code>; <code>goto(I6,c)=I6, goto(I6,d)=I7</code>. Reduce chỉ trên đúng lookahead (vd reduce <code>C→d</code> tại <code>I4</code> khi thấy <code>c/d</code>, tại <code>I7</code> khi thấy <code>$</code>).</p>
+<div class="why">Vì sao tách <code>I3</code> (lookahead <code>c/d</code>) và <code>I6</code> (lookahead <code>$</code>) dù <b>lõi giống nhau</b>? Vì <code>C</code> thứ nhất đứng trước một <code>C</code> nữa nên sau nó là <code>c</code> hoặc <code>d</code> (FIRST của C); còn <code>C</code> thứ hai đứng cuối nên sau nó là <code>$</code>. Lookahead khác nhau ⇒ LR(1) giữ riêng. Nếu <b>gộp</b> hai trạng thái cùng lõi này (hợp lookahead <code>c/d/$</code>) ta được <b>LALR(1)</b> — bảng nhỏ hơn; ở đây gộp không sinh xung đột nên văn phạm cũng là LALR(1).</div>
+</div>
+</div>
+
+<!-- ============================ ĐỀ 2 ============================ -->
+<h3 id="bde2">Đề 2 <span class="badge">giải thích kiểu giáo trình</span></h3>
+<div class="exam">
+<p class="duration">Thời lượng gợi ý: 75 phút · Thang điểm 10.</p>
+
+<h4 class="q"><span class="pts">2.5 điểm</span>Câu 1. Vẽ DFA</h4>
+<p>Xây DFA trên <code>Σ={0,1}</code> nhận diện <code>L = { w | w kết thúc bằng "01" }</code>.</p>
+<div class="sol">
+<p><b>Ý tưởng:</b> trạng thái nhớ “phần đuôi dài nhất của mẫu <code>01</code> vừa khớp”: chưa khớp / vừa thấy <code>0</code> / vừa thấy <code>01</code>.</p>
+<pre class="mono">        1        0        1
+ →(q0) ──0──▶ (q1) ──1──▶ ((q2))
+   1↺          0↺          (q2 --1--> q0, q2 --0--> q1)
+q0 = chưa có đuôi hữu ích, q1 = đuôi là "0", q2 = đuôi là "01" (chấp nhận)</pre>
+<div class="tblwrap"><table>
+<tr><th>δ</th><th>0</th><th>1</th></tr>
+<tr><td class="rowh">→ q0</td><td>q1</td><td>q0</td></tr>
+<tr><td class="rowh">q1</td><td>q1</td><td>q2</td></tr>
+<tr><td class="rowh">*q2</td><td>q1</td><td>q0</td></tr>
+</table></div>
+<div class="why">Vì sao <code>q2 --0--> q1</code> chứ không quay về <code>q0</code>? Vì khi đang ở <code>q2</code> (đuôi <code>…01</code>) mà đọc thêm <code>0</code>, đuôi mới là <code>…010</code> — kết thúc bằng <code>0</code>, tức <b>vẫn là tiền tố hữu ích</b> của mẫu <code>01</code> (đã có <code>0</code>, chỉ cần <code>1</code> nữa). Vứt về <code>q0</code> sẽ “quên” mất chữ <code>0</code> vừa đọc và bỏ sót chuỗi như <code>0101</code>. Nguyên tắc: khi lệch mẫu, nhảy về trạng thái ứng với <b>hậu tố khớp dài nhất</b> (giống ý tưởng KMP).</div>
+</div>
+
+<h4 class="q"><span class="pts">3 điểm</span>Câu 2. Chứng minh L không chính quy</h4>
+<p>Chứng minh <code>L = {0ⁿ1ᵐ | n &gt; m ≥ 0}</code> không chính quy.</p>
+<div class="sol">
+<ol class="steps">
+  <li>Giả sử <code>L</code> chính quy ⇒ có hằng số bơm <code>p</code>.</li>
+  <li>Chọn <code>s = 0<sup>p+1</sup>1<sup>p</sup> ∈ L</code> (vì <code>p+1 &gt; p</code>), <code>|s| = 2p+1 ≥ p</code>.</li>
+  <li><code>s = xyz</code>, <code>|y|≥1</code>, <code>|xy|≤p</code> ⇒ (do <code>p</code> ký hiệu đầu đều là <code>0</code>) <code>y = 0<sup>k</sup></code>, <code>k≥1</code>.</li>
+  <li>Bơm <code>i=0</code>: <code>xy⁰z = xz = 0<sup>p+1−k</sup>1<sup>p</sup></code>. Số <code>0</code> là <code>p+1−k ≤ p</code> (vì <code>k≥1</code>), số <code>1</code> là <code>p</code>. Vậy số 0 <b>không còn lớn hơn</b> số 1 (thậm chí <code>≤</code>) ⇒ <code>xz ∉ L</code>, mâu thuẫn.</li>
+</ol>
+<p>⇒ <b><code>L</code> không chính quy.</b> ∎</p>
+<div class="why">Vì sao bơm <b>giảm</b> (<code>i=0</code>) thay vì tăng? Vì ràng buộc của <code>L</code> là <code>n &gt; m</code> và ta đặt <code>n=p+1</code> chỉ nhỉnh hơn <code>m=p</code> đúng 1. Chỉ cần <b>rút bớt</b> dù một ký hiệu <code>0</code> (bơm xuống) là phá ngay bất đẳng thức. Nếu bơm tăng (<code>i=2</code>) thì <code>n</code> càng lớn, vẫn <code>&gt; m</code> ⇒ không mâu thuẫn. <b>Mẹo:</b> chọn chuỗi “sát biên” của điều kiện rồi bơm về phía làm hỏng biên.</div>
+<div class="why">Vì sao được phép nói <code>y</code> toàn <code>0</code>? Vì <code>|xy|≤p</code> nên cả <code>x</code> lẫn <code>y</code> nằm trong <code>p</code> ký hiệu đầu tiên, mà chúng đều là <code>0</code>. Đây là công dụng cốt lõi của điều kiện (ii) — nó “khoá” vị trí của <code>y</code>.</div>
+</div>
+
+<h4 class="q"><span class="pts">2.5 điểm</span>Câu 3. Khử mơ hồ (dangling-else)</h4>
+<p>Cho văn phạm câu lệnh: <code>S → if E then S | if E then S else S | a</code> (a: lệnh khác). Chứng minh nhập nhằng và khử.</p>
+<div class="sol">
+<p><b>Nhập nhằng:</b> chuỗi <code>if E then if E then a else a</code> có 2 cây: <code>else</code> gắn với <code>if</code> <b>trong</b> hay <b>ngoài</b>.</p>
+<div class="itemsets">
+  <div class="iset"><b>Cách 1 (else ↔ if trong)</b>if E then [ if E then a else a ]</div>
+  <div class="iset"><b>Cách 2 (else ↔ if ngoài)</b>if E then [ if E then a ] else a</div>
+</div>
+<p><b>Khử</b> theo quy tắc “<code>else</code> gắn với <code>then</code> gần nhất”. Tách câu lệnh thành <b>“đã khớp” (M)</b> và <b>“chưa khớp” (U)</b>:</p>
+<pre class="mono">S → M | U
+M → if E then M else M | a        (mọi then đều có else đi kèm)
+U → if E then S
+  | if E then M else U            (nhánh then chứa lệnh đã khớp M)</pre>
+<div class="why">Vì sao cấu trúc M/U ép được “else gần nhất”? Một <code>if…then…else</code> chỉ hợp lệ khi phần giữa (<code>then …</code>) là câu lệnh <b>đã khớp M</b> — tức không chứa <code>then</code> nào “treo”. Do đó <code>else</code> không thể “nhảy qua” một <code>if…then</code> chưa khớp để gắn với <code>if</code> ngoài; nó buộc phải gắn với <code>then</code> gần nhất. Còn <code>U</code> (chưa khớp) luôn có ít nhất một <code>then</code> chưa có <code>else</code>, và nó chỉ xuất hiện ở <b>nhánh ngoài cùng bên phải</b> nên không gây hai cách đọc.</div>
+</div>
+
+<h4 class="q"><span class="pts">2 điểm</span>Câu 4. LR(1) — tại sao cần lookahead</h4>
+<p>Cho văn phạm con trỏ (kinh điển): <code>S → L = R | R</code>, <code>L → * R | id</code>, <code>R → L</code>. Xây các item LR(1) và giải thích vì sao SLR(1) thất bại còn LR(1) thì không.</p>
+<div class="sol">
+<p>Augment <code>S'→S</code>. FIRST(L)=FIRST(R)=FIRST(S)={ <code>*</code>, <code>id</code> }.</p>
+<div class="itemsets">
+  <div class="iset"><b>I0</b>[S'→·S, $]
+[S →·L=R, $]
+[S →·R,   $]
+[L →·*R,  =/$]
+[L →·id,  =/$]
+[R →·L,   $]</div>
+  <div class="iset"><b>I1=goto(I0,S)</b>[S'→S·, $]  <i>(accept)</i></div>
+  <div class="iset"><b>I2=goto(I0,L) ★</b>[S →L·=R, $]   <i>(shift &lsquo;=&rsquo;)</i>
+[R →L·,   $]    <i>(reduce R→L trên $)</i></div>
+  <div class="iset"><b>I3=goto(I0,R)</b>[S →R·, $]  <i>(reduce S→R)</i></div>
+  <div class="iset"><b>I4=goto(I0,*)</b>[L →*·R, =/$]
+[R →·L,  =/$]
+[L →·*R, =/$]
+[L →·id, =/$]</div>
+  <div class="iset"><b>I5=goto(I0,id)</b>[L →id·, =/$]  <i>(reduce L→id)</i></div>
+</div>
+<div class="warn"><b>Trạng thái ★ I2 là mấu chốt.</b> Nó chứa đồng thời:
+<br>• <code>[S→L·=R, $]</code> — muốn <b>shift</b> ký hiệu <code>=</code>;
+<br>• <code>[R→L·, $]</code> — muốn <b>reduce</b> <code>R→L</code>, nhưng <b>chỉ khi lookahead = <code>$</code></b>.</div>
+<div class="why">Vì sao <b>SLR(1) bị xung đột</b> tại I2? SLR đặt reduce <code>R→L</code> trên <b>toàn bộ</b> <code>FOLLOW(R) = { =, $ }</code>. Trong đó có <code>=</code>! Mà ô <code>=</code> lại đang là <b>shift</b> (từ <code>S→L·=R</code>) ⇒ <b>xung đột shift–reduce</b> trên <code>=</code>. SLR không phân biệt được vì nó dùng FOLLOW “thô” chung cho mọi ngữ cảnh.</div>
+<div class="why">Vì sao <b>LR(1) không xung đột</b>? Item hoàn tất ở I2 là <code>[R→L·, <b>$</b>]</code> — lookahead <b>chỉ có <code>$</code></b>, <b>không có <code>=</code></b>. Lý do: trong ngữ cảnh dẫn tới I2, sau <code>R</code> không bao giờ là <code>=</code> (chuỗi <code>= R</code> chỉ theo sau <code>L</code>, không theo sau <code>R</code>). Vì lookahead reduce (<code>$</code>) và ký hiệu shift (<code>=</code>) <b>rời nhau</b>, bảng LR(1) đặt được: <code>=</code> → shift, <code>$</code> → reduce. Hết xung đột. Đây là ví dụ chuẩn cho câu “LR(1) mạnh hơn SLR(1)”.</div>
+</div>
+</div>
+
+<!-- ============================ ĐỀ 3 ============================ -->
+<h3 id="bde3">Đề 3</h3>
+<div class="exam">
+<p class="duration">Thời lượng gợi ý: 75 phút · Thang điểm 10.</p>
+
+<h4 class="q"><span class="pts">2.5 điểm</span>Câu 1. Vẽ DFA</h4>
+<p>Xây DFA trên <code>Σ={a,b}</code> nhận diện <code>L = { w | số a chẵn VÀ số b chẵn }</code>.</p>
+<div class="sol">
+<p>Trạng thái = (chẵn/lẻ số a, chẵn/lẻ số b) ⇒ 4 trạng thái. <code>a</code> lật thành phần a; <code>b</code> lật thành phần b. Chấp nhận (chẵn,chẵn).</p>
+<div class="tblwrap"><table>
+<tr><th>Trạng thái (a,b)</th><th>a</th><th>b</th></tr>
+<tr><td class="rowh">→ *q0=(chẵn,chẵn)</td><td>q1</td><td>q2</td></tr>
+<tr><td class="rowh">q1=(lẻ,chẵn)</td><td>q0</td><td>q3</td></tr>
+<tr><td class="rowh">q2=(chẵn,lẻ)</td><td>q3</td><td>q0</td></tr>
+<tr><td class="rowh">q3=(lẻ,lẻ)</td><td>q2</td><td>q1</td></tr>
+</table></div>
+<p>Kiểm tra <code>abab</code>: (cc)→a(lc)→b(ll)→a(cl)→b(cc) chấp nhận ✓ (2 a, 2 b).</p>
+</div>
+
+<h4 class="q"><span class="pts">3 điểm</span>Câu 2. Chứng minh L không chính quy</h4>
+<p>Chứng minh <code>L = { a<sup>n²</sup> | n ≥ 0 } = {ε, a, aaaa, a⁹, a¹⁶, …}</code> không chính quy.</p>
+<div class="sol">
+<ol class="steps">
+  <li>Giả sử chính quy ⇒ có <code>p</code>. Chọn <code>s = a<sup>p²</sup> ∈ L</code>, <code>|s| = p² ≥ p</code>.</li>
+  <li><code>s = xyz</code>, <code>1 ≤ |y| ≤ |xy| ≤ p</code>. Đặt <code>k = |y|</code>, vậy <code>1 ≤ k ≤ p</code>.</li>
+  <li>Bơm <code>i=2</code>: <code>|xy²z| = p² + k</code>.</li>
+  <li>Ước lượng: <code>p² &lt; p² + k ≤ p² + p &lt; p² + 2p + 1 = (p+1)²</code>.</li>
+  <li>Vậy <code>p² &lt; |xy²z| &lt; (p+1)²</code> — độ dài nằm <b>giữa hai số chính phương liên tiếp</b> nên <b>không</b> là số chính phương ⇒ <code>xy²z ∉ L</code>, mâu thuẫn.</li>
+</ol>
+<p>⇒ <b><code>L</code> không chính quy.</b> ∎</p>
+</div>
+
+<h4 class="q"><span class="pts">2.5 điểm</span>Câu 3. Khử mơ hồ</h4>
+<p>Cho <code>E → E − E | E / E | ( E ) | id</code>. Chứng minh nhập nhằng và khử (cho <code>/</code> ưu tiên hơn <code>−</code>, cả hai kết hợp trái).</p>
+<div class="sol">
+<p><b>Nhập nhằng:</b> <code>id − id − id</code> có 2 cây <code>(id−id)−id</code> và <code>id−(id−id)</code> — khác giá trị ⇒ nhập nhằng (chưa kể xung đột ưu tiên <code>−</code> vs <code>/</code>).</p>
+<p><b>Khử:</b></p>
+<pre class="mono">E → E − T | T
+T → T / F | F
+F → ( E ) | id</pre>
+<p>Đệ quy trái ⇒ kết hợp trái (đúng ngữ nghĩa <code>−</code> và <code>/</code>: <code>8−3−2 = 3</code> chứ không phải <code>7</code>). <code>/</code> ở tầng <code>T</code> (trong hơn) ⇒ ưu tiên cao hơn <code>−</code>.</p>
+</div>
+
+<h4 class="q"><span class="pts">2 điểm</span>Câu 4. LR(1)</h4>
+<p>Cho <code>S → A A</code>, <code>A → a A | b</code>. Xây các item LR(1).</p>
+<div class="sol">
+<p>Augment <code>S'→S</code>. Đánh số 1:S→AA, 2:A→aA, 3:A→b. (Cấu trúc đồng dạng Đề 1 Câu 4.)</p>
+<div class="itemsets">
+  <div class="iset"><b>I0</b>[S'→·S, $]
+[S →·AA, $]
+[A →·aA, a/b]
+[A →·b,  a/b]</div>
+  <div class="iset"><b>I1=goto(I0,S)</b>[S'→S·, $] <i>(accept)</i></div>
+  <div class="iset"><b>I2=goto(I0,A)</b>[S →A·A, $]
+[A →·aA, $]
+[A →·b,  $]</div>
+  <div class="iset"><b>I3=goto(I0,a)</b>[A →a·A, a/b]
+[A →·aA, a/b]
+[A →·b,  a/b]</div>
+  <div class="iset"><b>I4=goto(I0,b)</b>[A →b·, a/b] <i>(reduce 3)</i></div>
+  <div class="iset"><b>I5=goto(I2,A)</b>[S →AA·, $] <i>(reduce 1)</i></div>
+  <div class="iset"><b>I6=goto(I2,a)</b>[A →a·A, $]
+[A →·aA, $]
+[A →·b,  $]</div>
+  <div class="iset"><b>I7=goto(I2,b)</b>[A →b·, $] <i>(reduce 3)</i></div>
+  <div class="iset"><b>I8=goto(I3,A)</b>[A →aA·, a/b] <i>(reduce 2)</i></div>
+  <div class="iset"><b>I9=goto(I6,A)</b>[A →aA·, $] <i>(reduce 2)</i></div>
+</div>
+<p>Chuyển vòng: <code>goto(I3,a)=I3, goto(I3,b)=I4</code>; <code>goto(I6,a)=I6, goto(I6,b)=I7</code>. Không xung đột ⇒ LR(1) (và gộp lõi ⇒ LALR(1)). Văn phạm nhận <code>L = {a^i b a^j b}</code>.</p>
+</div>
+</div>
+
+<!-- ============================ ĐỀ 4 ============================ -->
+<h3 id="bde4">Đề 4</h3>
+<div class="exam">
+<p class="duration">Thời lượng gợi ý: 75 phút · Thang điểm 10.</p>
+
+<h4 class="q"><span class="pts">2.5 điểm</span>Câu 1. Vẽ DFA</h4>
+<p>Xây DFA trên <code>Σ={0,1}</code> nhận diện <code>L = { w | w là biểu diễn nhị phân (đọc từ trái) của số chia hết cho 3 }</code>, <code>w ≠ ε</code>.</p>
+<div class="sol">
+<p>Trạng thái = giá trị số đã đọc <b>mod 3</b> (0,1,2). Đọc thêm bit <code>x</code>: giá trị mới = <code>2·(giá trị cũ) + x</code> (mod 3).</p>
+<div class="tblwrap"><table>
+<tr><th>δ (dư)</th><th>0 → 2r</th><th>1 → 2r+1</th></tr>
+<tr><td class="rowh">→ *r0</td><td>r0</td><td>r1</td></tr>
+<tr><td class="rowh">r1</td><td>r2</td><td>r0</td></tr>
+<tr><td class="rowh">r2</td><td>r1</td><td>r2</td></tr>
+</table></div>
+<p>Chấp nhận <code>r0</code>. Kiểm tra <code>110</code> (=6, ⋮3): r0→<sup>1</sup>r1→<sup>1</sup>r0→<sup>0</sup>r0 chấp nhận ✓. <code>101</code> (=5): r0→r1→r2→r2 từ chối ✓.</p>
+<p class="small">(Nếu cần loại <code>ε</code>: tách trạng thái đầu chưa đọc bit nào, không chấp nhận.)</p>
+</div>
+
+<h4 class="q"><span class="pts">3 điểm</span>Câu 2. Chứng minh L không chính quy</h4>
+<p>Chứng minh <code>L = { a<sup>i</sup>b<sup>j</sup> | i &lt; j }</code> không chính quy.</p>
+<div class="sol">
+<ol class="steps">
+  <li>Giả sử chính quy ⇒ có <code>p</code>. Chọn <code>s = a<sup>p</sup>b<sup>p+1</sup> ∈ L</code> (vì <code>p &lt; p+1</code>), <code>|s|=2p+1≥p</code>.</li>
+  <li><code>s=xyz</code>, <code>|xy|≤p</code> ⇒ <code>y=a<sup>k</sup></code>, <code>k≥1</code>.</li>
+  <li>Bơm <code>i=2</code>: <code>xy²z = a<sup>p+k</sup>b<sup>p+1</sup></code>. Vì <code>k≥1</code> ⇒ số <code>a = p+k ≥ p+1 =</code> số <code>b</code> ⇒ <b>không còn</b> <code>i &lt; j</code> ⇒ <code>xy²z ∉ L</code>. Mâu thuẫn.</li>
+</ol>
+<p>⇒ <b><code>L</code> không chính quy.</b> ∎ &nbsp;<span class="small">(Ở đây bơm <b>tăng</b> để đẩy số <code>a</code> vượt số <code>b</code> — ngược với Đề 2 Câu 2, do biên là <code>i&lt;j</code>.)</span></p>
+</div>
+
+<h4 class="q"><span class="pts">2.5 điểm</span>Câu 3. Khử mơ hồ</h4>
+<p>Cho văn phạm danh sách lệnh: <code>S → S ; S | a</code>. Chứng minh nhập nhằng và khử (chuỗi lệnh, dùng kết hợp phải).</p>
+<div class="sol">
+<p><b>Nhập nhằng:</b> <code>a ; a ; a</code> có 2 cây <code>(a;a);a</code> và <code>a;(a;a)</code> ⇒ nhập nhằng.</p>
+<p><b>Khử</b> (ép kết hợp phải, xem <code>;</code> như dấu phân tách xâu):</p>
+<pre class="mono">S → a ; S | a          (đệ quy phải ⇒ a;a;a đọc là a;(a;a))</pre>
+<p>Nay mỗi chuỗi lệnh chỉ còn một cây: luôn tách phần tử <b>đầu</b> rồi đệ quy phần đuôi.</p>
+</div>
+
+<h4 class="q"><span class="pts">2 điểm</span>Câu 4. LR(1)</h4>
+<p>Cho <code>S → a S b | c</code>. Xây các item LR(1) (nhận <code>L={aⁿcbⁿ}</code>).</p>
+<div class="sol">
+<p>Augment <code>S'→S</code>. Đánh số 1:S→aSb, 2:S→c.</p>
+<div class="itemsets">
+  <div class="iset"><b>I0</b>[S'→·S, $]
+[S →·aSb, $]
+[S →·c,   $]</div>
+  <div class="iset"><b>I1=goto(I0,S)</b>[S'→S·, $] <i>(accept)</i></div>
+  <div class="iset"><b>I2=goto(I0,a)</b>[S →a·Sb, $]
+[S →·aSb, b]
+[S →·c,   b]</div>
+  <div class="iset"><b>I3=goto(I0,c)</b>[S →c·, $] <i>(reduce 2 trên $)</i></div>
+  <div class="iset"><b>I4=goto(I2,S)</b>[S →aS·b, $]</div>
+  <div class="iset"><b>I5=goto(I2,a)</b>[S →a·Sb, b]
+[S →·aSb, b]
+[S →·c,   b]</div>
+  <div class="iset"><b>I6=goto(I2,c)</b>[S →c·, b] <i>(reduce 2 trên b)</i></div>
+  <div class="iset"><b>I7=goto(I4,b)</b>[S →aSb·, $] <i>(reduce 1 trên $)</i></div>
+</div>
+<p>Từ <code>I5</code>: <code>goto(I5,S)=I8:[S→aS·b, b]</code>, rồi <code>goto(I8,b)=[S→aSb·, b]</code> (reduce 1 trên <code>b</code>); <code>goto(I5,a)=I5, goto(I5,c)=I6</code>. Lookahead phân biệt reduce theo tầng ngoặc (<code>$</code> ở ngoài cùng, <code>b</code> ở trong) ⇒ không xung đột, văn phạm LR(1).</p>
+</div>
+</div>
+
+<!-- ============================ ĐỀ 5 ============================ -->
+<h3 id="bde5">Đề 5</h3>
+<div class="exam">
+<p class="duration">Thời lượng gợi ý: 75 phút · Thang điểm 10.</p>
+
+<h4 class="q"><span class="pts">2.5 điểm</span>Câu 1. Vẽ DFA</h4>
+<p>Xây DFA trên <code>Σ={a,b}</code> nhận diện <code>L = { w | w KHÔNG chứa chuỗi con "aa" }</code>.</p>
+<div class="sol">
+<p>Trạng thái: <code>q0</code> (ký hiệu trước không phải <code>a</code>, hoặc đầu chuỗi), <code>q1</code> (vừa đọc một <code>a</code>), <code>qd</code> (đã gặp <code>aa</code> — bẫy, không chấp nhận). Chấp nhận <code>q0, q1</code>.</p>
+<div class="tblwrap"><table>
+<tr><th>δ</th><th>a</th><th>b</th></tr>
+<tr><td class="rowh">→ *q0</td><td>q1</td><td>q0</td></tr>
+<tr><td class="rowh">*q1</td><td>qd</td><td>q0</td></tr>
+<tr><td class="rowh">qd (bẫy)</td><td>qd</td><td>qd</td></tr>
+</table></div>
+<div class="why">Vì sao cần trạng thái “bẫy” <code>qd</code>? Vì DFA phải <b>đầy đủ</b> (mỗi trạng thái có cạnh cho mọi ký hiệu). Khi đã gặp <code>aa</code>, chuỗi vĩnh viễn bị loại dù đọc thêm gì ⇒ gom về một trạng thái không chấp nhận, tự lặp. Đọc <code>b</code> ở <code>q1</code> quay về <code>q0</code> vì <code>b</code> “ngắt” chuỗi <code>a</code> liên tiếp.</div>
+</div>
+
+<h4 class="q"><span class="pts">3 điểm</span>Câu 2. Chứng minh L không chính quy</h4>
+<p>Chứng minh <code>L = { a<sup>2ⁿ</sup> | n ≥ 0 } = {a, aa, aaaa, a⁸, …}</code> không chính quy <span class="small">(dạng “bộ đề bơm” trong bt)</span>.</p>
+<div class="sol">
+<ol class="steps">
+  <li>Giả sử chính quy ⇒ có <code>p</code>. Chọn <code>n</code> đủ lớn để <code>2ⁿ ≥ p</code>, lấy <code>s = a<sup>2ⁿ</sup> ∈ L</code>.</li>
+  <li><code>s=xyz</code>, <code>1 ≤ |y| ≤ |xy| ≤ p ≤ 2ⁿ</code>. Đặt <code>k=|y|</code>, <code>1≤k≤2ⁿ</code>.</li>
+  <li>Bơm <code>i=2</code>: <code>|xy²z| = 2ⁿ + k</code>.</li>
+  <li>Chặn: <code>2ⁿ &lt; 2ⁿ + k ≤ 2ⁿ + 2ⁿ = 2<sup>n+1</sup></code>.</li>
+  <li>Vậy <code>2ⁿ &lt; |xy²z| &lt; 2<sup>n+1</sup></code> — độ dài nằm <b>giữa hai luỹ thừa 2 liên tiếp</b> ⇒ không là luỹ thừa của 2 ⇒ <code>xy²z ∉ L</code>. Mâu thuẫn.</li>
+</ol>
+<p>⇒ <b><code>L</code> không chính quy.</b> ∎</p>
+</div>
+
+<h4 class="q"><span class="pts">2.5 điểm</span>Câu 3. Khử mơ hồ</h4>
+<p>Cho văn phạm biểu thức luận lý: <code>B → B ∨ B | B ∧ B | ¬ B | ( B ) | id</code>. Chứng minh nhập nhằng và khử (ưu tiên <code>¬</code> &gt; <code>∧</code> &gt; <code>∨</code>; <code>∧,∨</code> kết hợp trái).</p>
+<div class="sol">
+<p><b>Nhập nhằng:</b> <code>id ∨ id ∧ id</code> có 2 cây (∧ trước / ∨ trước). ⇒ nhập nhằng.</p>
+<p><b>Khử — phân 3 tầng theo độ ưu tiên</b> (∨ ngoài cùng, ∧ giữa, ¬ và hạng tử trong cùng):</p>
+<pre class="mono">B → B ∨ T | T          (tầng OR)
+T → T ∧ F | F          (tầng AND, ưu tiên cao hơn OR)
+F → ¬ F | ( B ) | id   (¬ ưu tiên cao nhất; đệ quy để ¬¬id hợp lệ)</pre>
+<div class="why">Vì sao <code>¬</code> đặt ở <code>F → ¬F</code> (đệ quy phải, cùng tầng trong cùng)? Vì <code>¬</code> là toán tử <b>một ngôi</b> ưu tiên cao nhất và <b>kết hợp phải</b> (<code>¬¬id = ¬(¬id)</code>); đặt ở tầng trong cùng để nó “bám” hạng tử chặt nhất, gộp trước cả <code>∧</code> và <code>∨</code>.</div>
+</div>
+
+<h4 class="q"><span class="pts">2 điểm</span>Câu 4. LR(1)</h4>
+<p>Cho <code>S → ( S ) | ε</code> (cặp ngoặc lồng). Xây các item LR(1).</p>
+<div class="sol">
+<p>Augment <code>S'→S</code>. Đánh số 1:S→(S), 2:S→ε.</p>
+<div class="itemsets">
+  <div class="iset"><b>I0</b>[S'→·S, $]
+[S →·(S), $]
+[S →·,    $]  <i>(reduce S→ε trên $)</i></div>
+  <div class="iset"><b>I1=goto(I0,S)</b>[S'→S·, $] <i>(accept)</i></div>
+  <div class="iset"><b>I2=goto(I0,&lsquo;(&rsquo;)</b>[S →(·S), $]
+[S →·(S), )]
+[S →·,    )]  <i>(reduce S→ε trên &lsquo;)&rsquo;)</i></div>
+  <div class="iset"><b>I3=goto(I2,S)</b>[S →(S·), $]  <i>(shift &lsquo;)&rsquo;)</i></div>
+  <div class="iset"><b>I4=goto(I2,&lsquo;(&rsquo;)</b>[S →(·S), )]
+[S →·(S), )]
+[S →·,    )]  <i>(reduce S→ε trên &lsquo;)&rsquo;)</i></div>
+  <div class="iset"><b>I5=goto(I3,&lsquo;)&rsquo;)</b>[S →(S)·, $] <i>(reduce 1 trên $)</i></div>
+</div>
+<p>Tiếp: <code>goto(I4,S)=I6:[S→(S·), )]</code>, <code>goto(I6,&lsquo;)&rsquo;)=[S→(S)·, )]</code> (reduce 1 trên <code>)</code>); <code>goto(I4,&lsquo;(&rsquo;)=I4</code>. Item <code>S→ε</code> reduce đúng lookahead theo tầng (<code>$</code> ngoài cùng, <code>)</code> bên trong) ⇒ không xung đột ⇒ văn phạm LR(1).</p>
+</div>
+</div>
 
 <!-- ---------- CHECKLIST ---------- -->
 <h2 id="checklist">Checklist ôn thi nhanh</h2>
